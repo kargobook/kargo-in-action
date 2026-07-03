@@ -26,6 +26,13 @@ The getting-started walkthrough in chapter 3 promotes the sample application **d
 
 Later chapters also reference the **[payments-api](https://github.com/kargobook/payments-api)** and **[auth-service](https://github.com/kargobook/auth-service)** sample services for multi-service examples.
 
+The chapter 4 Helm chart and multi-artifact examples subscribe to a small demo-app chart published as an OCI artifact at `oci://ghcr.io/kargobook/charts/demo-app`. Its source lives in [`charts/demo-app/`](charts/demo-app); it is published with:
+
+```sh
+helm package charts/demo-app
+helm push demo-app-<version>.tgz oci://ghcr.io/kargobook/charts
+```
+
 You will need a Kubernetes cluster with Argo CD and Kargo installed; chapter 3 covers the full installation.
 
 ## Feedback

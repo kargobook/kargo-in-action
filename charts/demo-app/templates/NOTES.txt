@@ -1,0 +1,6 @@
+demo-app {{ .Chart.AppVersion }} has been deployed as release {{ .Release.Name }}.
+
+Reach it with a port-forward:
+
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "demo-app.fullname" . }} 8080:{{ .Values.service.port }}
+  # then open http://127.0.0.1:8080

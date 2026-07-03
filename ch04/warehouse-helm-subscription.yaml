@@ -6,6 +6,5 @@
 spec:
   subscriptions:
   - chart:
-      repoURL: https://charts.example.com          # <1>
-      name: demo-app                                # <2>
-      semverConstraint: ">=0.5.0 <1.0.0"            # <3>
+      repoURL: oci://ghcr.io/kargobook/charts/demo-app   # <1>
+      semverConstraint: ">=1.0.0 <2.0.0"                 # <2>

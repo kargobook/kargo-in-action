@@ -1,0 +1,14 @@
+apiVersion: v2
+name: demo-app
+description: Sample Helm chart for the demo-app service used in Kargo in Action (Manning)
+type: application
+# Chart version. Kargo Warehouse chart subscriptions track this via semverConstraint.
+version: 1.1.0
+# Version of the application this chart deploys (defaults the demo-app image tag).
+appVersion: "1.1.0"
+home: https://github.com/kargobook/demo-app
+sources:
+  - https://github.com/kargobook/demo-app
+maintainers:
+  - name: Kargo in Action
+    url: https://github.com/kargobook
