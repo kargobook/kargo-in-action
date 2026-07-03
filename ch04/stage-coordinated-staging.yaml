@@ -7,21 +7,21 @@ apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
   name: staging
-  namespace: demo
+  namespace: kargobook-demo
 spec:
   requestedFreight:                                  # <1>
   - origin:
       kind: Warehouse
-      name: api-warehouse
+      name: payments-warehouse
     sources:
       stages:
-      - dev-api
+      - payments-dev
   - origin:
       kind: Warehouse
-      name: frontend-warehouse                       # <2>
+      name: auth-warehouse                           # <2>
     sources:
       stages:
-      - dev-frontend
+      - auth-dev
   promotionTemplate:
     spec:
       vars:
@@ -34,19 +34,23 @@ spec:
           checkout:
           - branch: main
             path: ./repo
-      - uses: kustomize-set-image                    # <3>
+      - uses: kustomize-set-image
         config:
-          path: ./repo/envs/staging
+          path: ./repo/apps/payments/envs/staging
           images:
-          - image: ghcr.io/example/api
-            tag: ${{ imageFrom("ghcr.io/example/api").Tag }}
-          - image: ghcr.io/example/frontend
-            tag: ${{ imageFrom("ghcr.io/example/frontend").Tag }}
-      - uses: git-commit
+          - image: ghcr.io/kargobook/payments-api
+            tag: ${{ imageFrom("ghcr.io/kargobook/payments-api").Tag }}
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/apps/auth/envs/staging
+          images:
+          - image: ghcr.io/kargobook/auth-service
+            tag: ${{ imageFrom("ghcr.io/kargobook/auth-service").Tag }}
+      - uses: git-commit                             # <3>
         as: commit
         config:
           path: ./repo
-          message: 'Promote api and frontend to staging'
+          message: 'Promote payments-api and auth-service to staging'
       - uses: git-push
         config:
           path: ./repo
@@ -54,6 +58,9 @@ spec:
       - uses: argocd-update
         config:
           apps:
-          - name: demo-staging
+          - name: payments-staging
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+          - name: auth-staging
             sources:
             - repoURL: ${{ vars.gitRepo }}
