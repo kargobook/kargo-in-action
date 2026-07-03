@@ -1,0 +1,29 @@
+# Chapter: 11. Multi-Service Promotion
+# Section: Independent Promotion Graphs at Scale
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+# payments-warehouse.yaml
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: payments-warehouse
+  namespace: kargo
+spec:
+  subscriptions:
+  - image:
+      repoURL: ghcr.io/kargobook/payments-api
+      semverConstraint: ">=2.0.0 <3.0.0"
+---
+# auth-warehouse.yaml
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: auth-warehouse
+  namespace: kargo
+spec:
+  subscriptions:
+  - image:
+      repoURL: ghcr.io/kargobook/auth-service
+      semverConstraint: ">=1.0.0 <2.0.0"
+

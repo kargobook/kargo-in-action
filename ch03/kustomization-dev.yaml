@@ -1,0 +1,14 @@
+# Chapter: 3. Getting started with Kargo
+# Section: Preparing the GitOps repository
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: demo-dev
+resources:
+  - ../../base
+images:
+  - name: ghcr.io/kargobook/demo-app
+    newTag: 1.0.0
+

@@ -1,0 +1,12 @@
+# Chapter: Appendix A. Kargo Resource Reference
+# Section: Subscription Fields
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+subscriptions:
+- git:
+    repoURL: https://github.com/kargobook/demo-gitops.git  # Required: Git repository URL
+    branch: main                               # Branch to watch
+    semverConstraint: ">=1.0.0"                # Matches tags on the branch
+    discoveryLimit: 10
+

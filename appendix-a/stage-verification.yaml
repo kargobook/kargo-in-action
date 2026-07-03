@@ -1,0 +1,17 @@
+# Chapter: Appendix A. Kargo Resource Reference
+# Section: verification Fields
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+verification:
+  analysisTemplates:
+  - name: success-rate-check             # AnalysisTemplate resource name
+  analysisRunMetadata:
+    labels:
+      env: staging
+    annotations:
+      team: payments
+    args:
+    - name: service-url
+      value: https://staging.payments.example.com
+

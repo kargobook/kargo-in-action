@@ -1,0 +1,11 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.1.1 Subscription types
+# Kargo version: 1.x
+# Status: VERIFIED
+
+spec:
+  subscriptions:
+  - chart:
+      repoURL: https://charts.example.com          # <1>
+      name: demo-app                                # <2>
+      semverConstraint: ">=0.5.0 <1.0.0"            # <3>

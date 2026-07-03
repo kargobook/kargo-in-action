@@ -1,0 +1,15 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.1.1 Subscription types
+# Kargo version: 1.x
+# Status: VERIFIED
+
+spec:
+  subscriptions:
+  - image:
+      repoURL: ghcr.io/kargobook/demo-app                 # <1>
+      semverConstraint: ">=1.0.0 <2.0.0"                # <2>
+      ignoreTags:                                       # <3>
+      - latest
+      - dev
+      - ".*-rc.*"
+      platform: linux/amd64                             # <4>

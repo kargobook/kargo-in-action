@@ -1,0 +1,18 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.4.2 The release candidate pattern
+# Kargo version: 1.x
+# Status: VERIFIED
+#
+# Fragment showing the requestedFreight change for any production Stage
+# that subscribes to the rc Stage. Apply the same shape to prod-us-east,
+# prod-us-west, prod-eu, etc.; what changes per region is the kustomize path and the
+# Argo CD Application name.
+
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: demo-app
+    sources:
+      stages:
+      - rc

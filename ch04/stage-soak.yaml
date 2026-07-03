@@ -1,0 +1,51 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.3 Designing Stage graphs
+# Kargo version: 1.x
+# Status: VERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: soak
+  namespace: demo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: demo-app
+    sources:
+      stages:
+      - staging                               # <1>
+  promotionTemplate:
+    spec:
+      vars:
+        - name: gitRepo
+          value: https://github.com/kargobook/demo-gitops.git
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/envs/soak              # <2>
+          images:
+          - image: ghcr.io/kargobook/demo-app
+            tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./repo
+          message: 'Promote to soak: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main
+      - uses: argocd-update
+        config:
+          apps:
+          - name: demo-soak
+            sources:
+            - repoURL: ${{ vars.gitRepo }}

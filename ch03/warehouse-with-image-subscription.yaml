@@ -1,0 +1,16 @@
+# Chapter: 3. Getting started with Kargo
+# Section: The core resource model
+# Kargo version: 1.x
+# Status: VERIFIED
+# Source: https://github.com/kargobook/demo-gitops-orig/blob/main/setup/04-warehouse.yaml
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: demo-app
+  namespace: demo
+spec:
+  subscriptions:
+  - image:
+      repoURL: ghcr.io/kargobook/demo-app
+      semverConstraint: ">=1.0.0 <2.0.0"

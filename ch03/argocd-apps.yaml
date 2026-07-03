@@ -1,0 +1,80 @@
+# Chapter: 3. Getting started with Kargo
+# Section: Creating the Argo CD Applications
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-dev
+  namespace: argocd
+  annotations:
+    kargo.akuity.io/authorized-stage: demo:dev
+  labels:
+    kargo.akuity.io/project: demo
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<your-github-username>/demo-gitops.git
+    targetRevision: main
+    path: envs/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-staging
+  namespace: argocd
+  annotations:
+    kargo.akuity.io/authorized-stage: demo:staging
+  labels:
+    kargo.akuity.io/project: demo
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<your-github-username>/demo-gitops.git
+    targetRevision: main
+    path: envs/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-prod
+  namespace: argocd
+  annotations:
+    kargo.akuity.io/authorized-stage: demo:prod
+  labels:
+    kargo.akuity.io/project: demo
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<your-github-username>/demo-gitops.git
+    targetRevision: main
+    path: envs/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+

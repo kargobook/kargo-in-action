@@ -1,0 +1,38 @@
+# Chapter: 12. Multi-Team and Platform Patterns
+# Section: Cross-Team Promotion Dependencies
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: payments-staging
+  namespace: payments
+spec:
+  subscriptions:
+    upstreamStages:
+    - name: database-staging
+      namespace: infrastructure
+  promotionTemplate:
+    spec:
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/apps/payments/envs/staging
+          images:
+          - image: ghcr.io/kargobook/payments-api
+      - uses: git-commit
+        config:
+          path: ./repo
+          message: "Promote payments to staging: ${{ freight.images[0].tag }}"
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main
+

@@ -1,0 +1,39 @@
+# Chapter: Appendix A. Kargo Resource Reference
+# Section: promotionTemplate Fields
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+promotionTemplate:
+  spec:
+    vars:                                # Reusable template variables
+    - name: gitopsRepo
+      value: https://github.com/kargobook/demo-gitops.git
+    steps:
+    - uses: git-clone                    # Built-in step name
+      as: clone                          # Alias for referencing outputs
+      config:                            # Step-specific configuration
+        repoURL: ${{ vars.gitopsRepo }}
+        checkout:
+        - branch: main
+          path: ./repo
+    - uses: kustomize-set-image
+      config:
+        path: ./repo/envs/staging
+        images:
+        - image: registry.example.com/payments-api
+          tag: ${{ imageFrom("registry.example.com/payments-api").Tag }}
+    - uses: git-commit
+      as: commit
+      config:
+        path: ./repo
+        message: "chore: promote payments-api ${{ freight.images[0].tag }}"
+    - uses: git-push
+      config:
+        path: ./repo
+    - uses: argocd-update
+      config:
+        apps:
+        - name: payments-staging
+          sources:
+          - repoURL: ${{ vars.gitopsRepo }}
+

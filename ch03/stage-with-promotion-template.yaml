@@ -1,0 +1,51 @@
+# Chapter: 3. Getting started with Kargo
+# Section: The core resource model
+# Kargo version: 1.x
+# Status: VERIFIED
+# Source: https://github.com/kargobook/demo-gitops-orig/blob/main/setup/05-stage-dev.yaml
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: dev
+  namespace: demo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: demo-app
+    sources:
+      direct: true
+  promotionTemplate:
+    spec:
+      vars:
+        - name: gitRepo
+          value: https://github.com/kargobook/demo-gitops.git
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/envs/dev
+          images:
+          - image: ghcr.io/kargobook/demo-app
+            tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./repo
+          message: 'Promote to dev: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main
+      - uses: argocd-update
+        config:
+          apps:
+          - name: demo-dev
+            sources:
+            - repoURL: ${{ vars.gitRepo }}

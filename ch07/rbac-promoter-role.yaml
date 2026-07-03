@@ -1,0 +1,35 @@
+# Chapter: 12. Multi-Team and Platform Patterns
+# Section: Kubernetes RBAC for Namespace Isolation
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: promoter
+  namespace: payments
+rules:
+- apiGroups: ["kargo.akuity.io"]
+  resources: ["warehouses", "stages", "freight"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["kargo.akuity.io"]
+  resources: ["promotions"]
+  verbs: ["get", "list", "watch", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: payments-team-promoters
+  namespace: payments
+subjects:
+- kind: User
+  name: alice
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: bob
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: promoter
+  apiGroup: rbac.authorization.k8s.io
+

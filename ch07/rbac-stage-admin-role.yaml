@@ -1,0 +1,15 @@
+# Chapter: 12. Multi-Team and Platform Patterns
+# Section: Kubernetes RBAC for Namespace Isolation
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: stage-admin
+  namespace: payments
+rules:
+- apiGroups: ["kargo.akuity.io"]
+  resources: ["warehouses", "stages", "freight", "promotions"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+

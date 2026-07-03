@@ -1,0 +1,77 @@
+# Chapter: 11. Multi-Service Promotion
+# Section: Defining Independent Dev Stages
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: api-dev
+  namespace: kargo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: api-warehouse
+    sources:
+      direct: true
+  promotionTemplate:
+    spec:
+      autoPromotionEnabled: true
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/apps/api/envs/dev
+          images:
+          - image: ghcr.io/example/api-service
+      - uses: git-commit
+        config:
+          path: ./repo
+          message: "Promote api to dev: ${{ freight.image.tag }}"
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: frontend-dev
+  namespace: kargo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: frontend-warehouse
+    sources:
+      direct: true
+  promotionTemplate:
+    spec:
+      autoPromotionEnabled: true
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/apps/frontend/envs/dev
+          images:
+          - image: ghcr.io/example/frontend-service
+      - uses: git-commit
+        config:
+          path: ./repo
+          message: "Promote frontend to dev: ${{ freight.image.tag }}"
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main
+

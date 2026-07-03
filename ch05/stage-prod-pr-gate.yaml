@@ -1,0 +1,58 @@
+# Chapter: 5. Promoting safely: automatic, manual, and recoverable
+# Section: 5.3.1 Pull request-based approval gates
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: prod
+  namespace: demo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: demo-app
+    sources:
+      stages:
+      - staging
+  promotionTemplate:
+    spec:
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/envs/prod
+          images:
+          - image: ghcr.io/kargobook/demo-app
+            tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./repo
+          message: "Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}"
+      - uses: git-open-pr
+        as: open-pr
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          sourceBranch: promote/prod-${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+          targetBranch: main
+          title: "Promote ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production"
+          description: |
+            Promotes ghcr.io/kargobook/demo-app:${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production.
+
+            Upstream stage: staging
+
+            Review the changes below and merge to approve the promotion.
+      - uses: git-wait-for-pr
+        as: wait-pr
+        retry:
+          timeout: 24h
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          prNumber: ${{ outputs['open-pr'].pr.id }}

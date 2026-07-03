@@ -1,0 +1,31 @@
+# Chapter: 12. Multi-Team and Platform Patterns
+# Section: Kargo Project Promotion Policies
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Project
+metadata:
+  name: payments
+spec:
+  promotionPolicies:
+  # Any team member can promote to dev and staging
+  - stage: payments-dev
+    authorizedPromoters:
+    - subjectType: Group
+      name: payments-team
+  - stage: payments-staging
+    authorizedPromoters:
+    - subjectType: Group
+      name: payments-team
+  # Only senior engineers and the CI bot can promote to production
+  - stage: payments-prod
+    authorizedPromoters:
+    - subjectType: User
+      name: alice
+    - subjectType: User
+      name: carol
+    - subjectType: ServiceAccount
+      name: payments-release-bot
+      namespace: payments
+

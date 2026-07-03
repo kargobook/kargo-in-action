@@ -1,0 +1,52 @@
+# Chapter: 11. Multi-Service Promotion
+# Section: Coordinated Production
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: coordinated-prod
+  namespace: kargo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: api-warehouse
+    sources:
+      stages:
+      - coordinated-staging
+  - origin:
+      kind: Warehouse
+      name: frontend-warehouse
+    sources:
+      stages:
+      - coordinated-staging
+  promotionTemplate:
+    spec:
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/apps/api/envs/prod
+          images:
+          - image: ghcr.io/example/api-service
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/apps/frontend/envs/prod
+          images:
+          - image: ghcr.io/example/frontend-service
+      - uses: git-commit
+        config:
+          path: ./repo
+          message: "Coordinate api ${{ freight.images[0].tag }} and frontend ${{ freight.images[1].tag }}"
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main
+

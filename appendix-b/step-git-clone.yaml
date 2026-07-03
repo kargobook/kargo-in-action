@@ -1,0 +1,13 @@
+# Chapter: Appendix B. Built-In Promotion Step Reference
+# Section: git-clone
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+- uses: git-clone
+  as: clone
+  config:
+    repoURL: https://github.com/kargobook/demo-gitops.git
+    checkout:
+    - branch: main
+      path: ./repo
+

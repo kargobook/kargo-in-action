@@ -1,0 +1,12 @@
+# Chapter: Appendix B. Built-In Promotion Step Reference
+# Section: yaml-update
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+- uses: yaml-update
+  config:
+    path: ./repo/values-staging.yaml
+    updates:
+    - key: image.tag
+      value: ${{ imageFrom("registry.example.com/payments-api").Tag }}
+

@@ -1,0 +1,19 @@
+# Chapter: 12. Multi-Team and Platform Patterns
+# Section: The Per-Project Namespace Pattern
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Project
+metadata:
+  name: payments
+spec:
+  promotionPolicies:
+  - stage: payments-prod
+    authorizedPromoters:
+    - subjectType: User
+      name: alice
+    - subjectType: ServiceAccount
+      name: payments-ci-bot
+      namespace: payments
+

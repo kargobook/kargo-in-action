@@ -1,0 +1,42 @@
+# Chapter: 5. Promoting safely: automatic, manual, and recoverable
+# Section: 5.3.2 Soak-based eligibility
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: prod
+  namespace: demo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: demo-app
+    sources:
+      stages:
+      - staging
+      requiredSoakTime: 2h
+  promotionTemplate:
+    spec:
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: https://github.com/kargobook/demo-gitops.git
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image
+        config:
+          path: ./repo/envs/prod
+          images:
+          - image: ghcr.io/kargobook/demo-app
+            tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+      - uses: git-commit
+        config:
+          path: ./repo
+          message: "Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}"
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main

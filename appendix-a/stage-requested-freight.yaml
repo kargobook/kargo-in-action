@@ -1,0 +1,15 @@
+# Chapter: Appendix A. Kargo Resource Reference
+# Section: requestedFreight Fields
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+requestedFreight:
+- origin:
+    kind: Warehouse                      # Warehouse | Stage
+    name: payments-warehouse             # Name of the source
+  sources:
+    direct: true                         # Accept Freight directly from Warehouse
+    stages:                              # Or: require Freight that passed these upstream Stages
+    - payments-dev
+    - payments-staging
+

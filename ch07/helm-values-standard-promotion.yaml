@@ -1,0 +1,27 @@
+# Chapter: 12. Multi-Team and Platform Patterns
+# Section: Standardized Stage Templates
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+# values.yaml for a product team's promotion graph
+service:
+  name: payments
+  imageRepo: ghcr.io/kargobook/payments-api
+  semverConstraint: ">=2.0.0 <3.0.0"
+
+gitops:
+  repoURL: https://github.com/kargobook/demo-gitops.git
+  paths:
+    dev: apps/payments/envs/dev
+    staging: apps/payments/envs/staging
+    prod: apps/payments/envs/prod
+
+promotion:
+  staging:
+    requirePullRequest: true
+  prod:
+    requirePullRequest: true
+    authorizedPromoters:
+    - alice
+    - carol
+

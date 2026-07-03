@@ -1,0 +1,6 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.2.1 Version constraints
+# Kargo version: 1.x
+# Status: VERIFIED
+
+semverConstraint: ">=1.2.0-rc.0 <1.2.0"   # <1>

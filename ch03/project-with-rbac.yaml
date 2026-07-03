@@ -1,0 +1,17 @@
+# Chapter: 3. Getting started with Kargo
+# Section: The core resource model
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Project
+metadata:
+  name: payments
+spec:
+  promotionPolicies:
+  - stage: payments-prod
+    authorizedPromoters:
+    - subjectType: User
+      name: alice@example.com
+    - subjectType: User
+      name: bob@example.com

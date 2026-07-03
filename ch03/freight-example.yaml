@@ -1,0 +1,22 @@
+# Chapter: 3. Getting started with Kargo
+# Section: The core resource model
+# Kargo version: 1.x
+# Status: VERIFIED
+#
+# This file is illustrative only. Freight is created by Kargo's Warehouse
+# controller; you do not author Freight by hand. Shown here to make the
+# resource's shape visible during the conceptual overview.
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Freight
+metadata:
+  name: 7b2f9a8e3c1d5f4a6b8e9c0d2f1a5b7c
+  namespace: demo
+spec:
+  origin:
+    kind: Warehouse
+    name: demo-app
+  images:
+  - repoURL: ghcr.io/kargobook/demo-app
+    tag: 1.2.0
+    digest: sha256:a3b9e7f2c1d4f8a2b6c4e1d7f3a9b5c2e4f8a2b6e9d1c5f7

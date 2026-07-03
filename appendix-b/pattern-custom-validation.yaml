@@ -1,0 +1,31 @@
+# Chapter: Appendix B. Built-In Promotion Step Reference
+# Section: Custom Validation with http Polling
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+steps:
+- uses: git-clone
+  # ... standard git update steps ...
+- uses: git-commit
+  as: commit
+  config:
+    path: ./out
+    message: "chore: promote to staging"
+- uses: git-push
+  config:
+    path: ./out
+- uses: argocd-update
+  config:
+    apps:
+    - name: my-app-staging
+      sources:
+      - repoURL: https://github.com/kargobook/demo-gitops.git
+        desiredRevision: ${{ outputs['commit'].commit }}
+- uses: http
+  retry:
+    timeout: 15m
+  config:
+    url: https://staging.example.com/readiness
+    successExpression: response.status == 200
+    failureExpression: response.status == 500
+

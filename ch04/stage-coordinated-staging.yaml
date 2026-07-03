@@ -1,0 +1,59 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.4.4 Multi-service Stage graphs
+# Kargo version: 1.x
+# Status: VERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: staging
+  namespace: demo
+spec:
+  requestedFreight:                                  # <1>
+  - origin:
+      kind: Warehouse
+      name: api-warehouse
+    sources:
+      stages:
+      - dev-api
+  - origin:
+      kind: Warehouse
+      name: frontend-warehouse                       # <2>
+    sources:
+      stages:
+      - dev-frontend
+  promotionTemplate:
+    spec:
+      vars:
+        - name: gitRepo
+          value: https://github.com/kargobook/demo-gitops.git
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./repo
+      - uses: kustomize-set-image                    # <3>
+        config:
+          path: ./repo/envs/staging
+          images:
+          - image: ghcr.io/example/api
+            tag: ${{ imageFrom("ghcr.io/example/api").Tag }}
+          - image: ghcr.io/example/frontend
+            tag: ${{ imageFrom("ghcr.io/example/frontend").Tag }}
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./repo
+          message: 'Promote api and frontend to staging'
+      - uses: git-push
+        config:
+          path: ./repo
+          targetBranch: main
+      - uses: argocd-update
+        config:
+          apps:
+          - name: demo-staging
+            sources:
+            - repoURL: ${{ vars.gitRepo }}

@@ -1,0 +1,22 @@
+# Chapter: 3. Getting started with Kargo
+# Section: The core resource model
+# Kargo version: 1.x
+# Status: VERIFIED
+#
+# This file is illustrative. In practice you either let Kargo create
+# Promotions automatically (auto-promotion policy) or trigger one through
+# the UI or `kargo` CLI. The YAML form shown here is what Kargo persists
+# in the cluster after the promotion runs.
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Promotion
+metadata:
+  name: demo-dev-to-7b2f9a8e3c1d5f4a
+  namespace: demo
+spec:
+  stage: dev
+  freight: 7b2f9a8e3c1d5f4a6b8e9c0d2f1a5b7c
+status:
+  phase: Succeeded
+  startTime: "2026-05-25T14:22:01Z"
+  finishTime: "2026-05-25T14:22:28Z"

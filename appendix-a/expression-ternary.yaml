@@ -1,0 +1,7 @@
+# Chapter: Appendix A. Kargo Resource Reference
+# Section: Ternary Expressions
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+value: "${{ ctx.stage == 'production' ? 'strict' : 'relaxed' }}"
+

@@ -1,0 +1,17 @@
+# Chapter: Appendix A. Kargo Resource Reference
+# Section: Subscription Fields
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+subscriptions:
+- image:
+    repoURL: registry.example.com/my-app       # Required: OCI registry URL
+    tagSelectionStrategy: SemVer               # SemVer | Newest | Alphabetically
+    semverConstraint: ">=1.0.0 <2.0.0"         # Used when strategy is SemVer
+    allowRegex: "^v[0-9]+\\.[0-9]+\\.[0-9]+$"  # Regex filter on tags
+    ignoreTags:                                 # Tags to explicitly ignore
+    - latest
+    - dev
+    platform: linux/amd64                      # Optional: constrain to platform
+    discoveryLimit: 20                         # Max Freight to retain
+

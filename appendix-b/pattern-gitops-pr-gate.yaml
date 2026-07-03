@@ -1,0 +1,46 @@
+# Chapter: Appendix B. Built-In Promotion Step Reference
+# Section: GitOps Update with PR Gate
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+vars:
+- name: imageRepo
+  value: registry.example.com/my-app
+steps:
+- uses: git-clone
+  config:
+    repoURL: https://github.com/kargobook/demo-gitops.git
+    checkout:
+    - branch: main
+      path: ./repo
+- uses: kustomize-set-image
+  as: update-image
+  config:
+    path: ./repo/envs/prod
+    images:
+    - image: ${{ vars.imageRepo }}
+      tag: ${{ imageFrom(vars.imageRepo).Tag }}
+- uses: git-commit
+  as: commit
+  config:
+    path: ./repo
+    message: ${{ outputs['update-image'].commitMessage }}
+- uses: git-push
+  as: push
+  config:
+    path: ./repo
+    generateTargetBranch: true
+- uses: git-open-pr
+  as: pr
+  config:
+    repoURL: https://github.com/kargobook/demo-gitops.git
+    sourceBranch: ${{ outputs['push'].branch }}
+    targetBranch: main
+    title: "Promote ${{ imageFrom(vars.imageRepo).Tag }} to production"
+- uses: git-wait-for-pr
+  retry:
+    timeout: 4h
+  config:
+    repoURL: https://github.com/kargobook/demo-gitops.git
+    prNumber: ${{ outputs['pr'].pr.id }}
+

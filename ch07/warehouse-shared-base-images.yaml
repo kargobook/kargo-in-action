@@ -1,0 +1,20 @@
+# Chapter: 12. Multi-Team and Platform Patterns
+# Section: Shared Warehouses
+# Kargo version: 1.x
+# Status: UNVERIFIED
+
+# Managed by the platform team in the kargo namespace
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: base-images
+  namespace: kargo
+spec:
+  subscriptions:
+  - image:
+      repoURL: ghcr.io/example/base-image
+      semverConstraint: ">=3.0.0 <4.0.0"
+  - image:
+      repoURL: ghcr.io/example/sidecar-proxy
+      semverConstraint: ">=1.5.0 <2.0.0"
+

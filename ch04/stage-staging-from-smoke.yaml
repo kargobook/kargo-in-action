@@ -1,0 +1,17 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.3 Designing Stage graphs
+# Kargo version: 1.x
+# Status: VERIFIED
+#
+# Fragment showing the requestedFreight change that makes the staging
+# Stage subscribe to smoke (rather than directly to dev) once a smoke-test
+# Stage has been inserted. Merge into your full staging Stage manifest.
+
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: demo-app
+    sources:
+      stages:
+      - smoke
