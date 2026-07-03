@@ -2,7 +2,7 @@
 # Section: The core resource model
 # Kargo version: 1.x
 # Status: VERIFIED
-# Source: https://github.com/kargobook/demo-gitops-orig/blob/main/setup/04-warehouse.yaml
+# Source: https://github.com/kargobook/demo-gitops/blob/main/setup/04-warehouse.yaml
 
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Warehouse

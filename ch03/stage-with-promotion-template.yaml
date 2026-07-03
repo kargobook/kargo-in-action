@@ -2,7 +2,7 @@
 # Section: The core resource model
 # Kargo version: 1.x
 # Status: VERIFIED
-# Source: https://github.com/kargobook/demo-gitops-orig/blob/main/setup/05-stage-dev.yaml
+# Source: https://github.com/kargobook/demo-gitops/blob/main/setup/05-stage-dev.yaml
 
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage

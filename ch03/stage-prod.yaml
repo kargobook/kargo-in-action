@@ -2,7 +2,7 @@
 # Section: Defining the Stages
 # Kargo version: 1.x
 # Status: VERIFIED
-# Source: https://github.com/kargobook/demo-gitops-orig/blob/main/setup/07-stage-prod.yaml
+# Source: https://github.com/kargobook/demo-gitops/blob/main/setup/07-stage-prod.yaml
 
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
