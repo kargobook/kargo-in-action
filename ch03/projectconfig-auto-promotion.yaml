@@ -1,0 +1,17 @@
+# Chapter: 3. Getting started with Kargo
+# Section: 3.5 Building your first promotion
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
+
+# tag::content[]
+apiVersion: kargo.akuity.io/v1alpha1
+kind: ProjectConfig
+metadata:
+  name: demo                                 # <1>
+  namespace: demo
+spec:
+  promotionPolicies:
+  - stageSelector:
+      name: dev                              # <2>
+    autoPromotionEnabled: true               # <3>
+# end::content[]
