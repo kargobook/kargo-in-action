@@ -1,6 +1,6 @@
 # Chapter: 3. Getting started with Kargo
 # Section: Creating the Argo CD Applications
-# Kargo version: 1.x
+# Kargo version: 1.11.0
 # Status: UNVERIFIED
 
 apiVersion: argoproj.io/v1alpha1
@@ -59,7 +59,7 @@ metadata:
   name: demo-prod
   namespace: argocd
   annotations:
-    kargo.akuity.io/authorized-stage: demo:prod
+    kargo.akuity.io/authorized-stage: demo:prod,demo:prod-hotfix
   labels:
     kargo.akuity.io/project: demo
 spec:
