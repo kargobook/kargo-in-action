@@ -59,7 +59,7 @@ metadata:
   name: demo-prod
   namespace: argocd
   annotations:
-    kargo.akuity.io/authorized-stage: demo:prod,demo:prod-hotfix
+    kargo.akuity.io/authorized-stage: demo:prod
   labels:
     kargo.akuity.io/project: demo
 spec:

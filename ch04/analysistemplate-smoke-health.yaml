@@ -8,9 +8,17 @@
 # the smoke overlay deploys into. Chapter 3 never creates that namespace, which
 # is why the two chapters carry separate templates.
 #
-# `result` is the value the web provider extracts from the response BODY at
-# `jsonPath`, not the HTTP status code, so the condition asserts on the body
-# demo-app's /healthz returns: {"status": "healthy"}.
+# Uses the `job` provider for the same reason chapter 3's template does: the
+# reader's demo-app is a static nginx image with no /healthz endpoint and no
+# JSON body, and the `job` provider is the one whose pass/fail rule the 1.11.x
+# docs state outright ("successful if the `Job` completes with an exit code of
+# zero and is otherwise considered to have failed"). See the full rationale in
+# the header of ch03/analysistemplate-dev-health.yaml.
+#
+# This is a real gate but a shallow one: it confirms the promoted image serves
+# HTTP at `/` in demo-smoke. Deepening it into a genuine smoke suite means
+# swapping the curl invocation for the service's own tests; nothing else about
+# the Stage changes.
 
 # tag::content[]
 apiVersion: argoproj.io/v1alpha1
@@ -23,9 +31,24 @@ spec:
   - name: http-ok
     count: 3
     interval: 20s
-    successCondition: result == "healthy"
     provider:
-      web:
-        url: http://demo-app.demo-smoke.svc.cluster.local/healthz
-        jsonPath: "{$.status}"
+      job:
+        spec:
+          backoffLimit: 0
+          template:
+            spec:
+              restartPolicy: Never
+              containers:
+              - name: probe
+                image: curlimages/curl:8.11.1
+                command:
+                - curl
+                - --fail
+                - --silent
+                - --show-error
+                - --max-time
+                - "10"
+                - --output
+                - /dev/null
+                - http://demo-app.demo-smoke.svc.cluster.local/
 # end::content[]

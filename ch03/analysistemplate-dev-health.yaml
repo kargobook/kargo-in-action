@@ -8,9 +8,31 @@
 # uses the same shape against demo-smoke: see
 # ch04/analysistemplate-smoke-health.yaml.
 #
-# `result` is the value the web provider extracts from the response BODY at
-# `jsonPath`, not the HTTP status code, so the condition asserts on the body
-# demo-app's /healthz returns: {"status": "healthy"}.
+# WHY THE `job` PROVIDER AND NOT `web`:
+#
+# The reader's demo-app is ghcr.io/kargobook/demo-app, built from
+# examples/ch06-gitops-demo/demo-app/Dockerfile: nginx:1.27-alpine with one
+# static index.html baked in, EXPOSE 80. It has no /healthz endpoint and
+# returns no JSON, so a `web` provider with `jsonPath: "{$.status}"` and
+# `successCondition: result == "healthy"` could never pass against it. (That
+# JSON health body belongs to the chapter 7 sample services,
+# examples/payments-api and examples/auth-service.)
+#
+# Pointing a `web` provider at `/` instead would return the static HTML page,
+# but the semantics of `result` for a non-JSON body, and whether the provider
+# fails a measurement on a non-2xx response, are not established anywhere we
+# can check: Kargo vendors only the Argo Rollouts API type stubs
+# (api/stubs/rollouts/v1alpha1/analysis_types.go), not the provider
+# implementation, and the 1.11.x docs say only that "the response payload is
+# set in a variable `result`".
+#
+# The `job` provider's pass/fail rule IS documented, in
+# 50-user-guide/60-reference-docs/50-analysis-templates.md: "When a `Job` is
+# used, the metric is considered successful if the `Job` completes with an exit
+# code of zero and is otherwise considered to have failed." So the gate below
+# rests only on that plus curl's own documented exit codes, and it asserts
+# something demo-app really does: serve HTTP at `/` on port 80, which is the
+# same thing base/deployment.yaml's readinessProbe checks.
 
 # tag::content[]
 apiVersion: argoproj.io/v1alpha1
@@ -23,9 +45,24 @@ spec:
   - name: http-ok
     count: 3
     interval: 20s
-    successCondition: result == "healthy"
     provider:
-      web:
-        url: http://demo-app.demo-dev.svc.cluster.local/healthz
-        jsonPath: "{$.status}"
+      job:
+        spec:
+          backoffLimit: 0
+          template:
+            spec:
+              restartPolicy: Never
+              containers:
+              - name: probe
+                image: curlimages/curl:8.11.1
+                command:
+                - curl
+                - --fail
+                - --silent
+                - --show-error
+                - --max-time
+                - "10"
+                - --output
+                - /dev/null
+                - http://demo-app.demo-dev.svc.cluster.local/
 # end::content[]
