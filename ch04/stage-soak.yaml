@@ -15,7 +15,7 @@ spec:
       name: demo-app
     sources:
       stages:
-      - staging                               # <1>
+      - pre-prod                               # <1>
   promotionTemplate:
     spec:
       vars:

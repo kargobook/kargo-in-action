@@ -18,7 +18,7 @@ promotionTemplate:
           path: ./repo
     - uses: kustomize-set-image
       config:
-        path: ./repo/envs/staging
+        path: ./repo/envs/pre-prod
         images:
         - image: registry.example.com/payments-api
           tag: ${{ imageFrom("registry.example.com/payments-api").Tag }}
@@ -33,7 +33,7 @@ promotionTemplate:
     - uses: argocd-update
       config:
         apps:
-        - name: payments-staging
+        - name: payments-pre-prod
           sources:
           - repoURL: ${{ vars.gitopsRepo }}
 

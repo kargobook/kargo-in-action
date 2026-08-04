@@ -9,12 +9,12 @@ metadata:
   name: payments
 spec:
   promotionPolicies:
-  # Any team member can promote to dev and staging
+  # Any team member can promote to dev and pre-prod
   - stage: payments-dev
     authorizedPromoters:
     - subjectType: Group
       name: payments-team
-  - stage: payments-staging
+  - stage: payments-pre-prod
     authorizedPromoters:
     - subjectType: Group
       name: payments-team

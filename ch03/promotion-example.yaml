@@ -18,5 +18,5 @@ spec:
   freight: 7b2f9a8e3c1d5f4a6b8e9c0d2f1a5b7c
 status:
   phase: Succeeded
-  startTime: "2026-05-25T14:22:01Z"
-  finishTime: "2026-05-25T14:22:28Z"
+  startedAt: "2026-05-25T14:22:01Z"
+  finishedAt: "2026-05-25T14:22:28Z"

@@ -8,10 +8,10 @@ verification:
   - name: success-rate-check             # AnalysisTemplate resource name
   analysisRunMetadata:
     labels:
-      env: staging
+      env: pre-prod
     annotations:
       team: payments
     args:
     - name: service-url
-      value: https://staging.payments.example.com
+      value: https://pre-prod.payments.example.com
 

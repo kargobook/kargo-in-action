@@ -11,5 +11,5 @@ requestedFreight:
     direct: true                         # Accept Freight directly from Warehouse
     stages:                              # Or: require Freight that passed these upstream Stages
     - payments-dev
-    - payments-staging
+    - payments-pre-prod
 

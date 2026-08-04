@@ -1,12 +1,12 @@
 # Chapter: 11. Multi-Service Promotion
-# Section: The Coordinated Staging Stage
+# Section: Schema Migrations and Coordinated Infrastructure
 # Kargo version: 1.x
 # Status: UNVERIFIED
 
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
-  name: coordinated-staging
+  name: api-pre-prod
   namespace: kargo
 spec:
   requestedFreight:
@@ -18,10 +18,10 @@ spec:
       - api-dev
   - origin:
       kind: Warehouse
-      name: frontend-warehouse
+      name: migrations-warehouse
     sources:
       stages:
-      - frontend-dev
+      - migrations-dev
   promotionTemplate:
     spec:
       steps:
@@ -33,18 +33,18 @@ spec:
             path: ./repo
       - uses: kustomize-set-image
         config:
-          path: ./repo/apps/api/envs/staging
+          path: ./repo/apps/api/envs/pre-prod
           images:
           - image: ghcr.io/example/api-service
       - uses: kustomize-set-image
         config:
-          path: ./repo/apps/frontend/envs/staging
+          path: ./repo/apps/migrations/envs/pre-prod
           images:
-          - image: ghcr.io/example/frontend-service
+          - image: ghcr.io/example/api-migrations
       - uses: git-commit
         config:
           path: ./repo
-          message: "Coordinate api ${{ freight.images[0].tag }} and frontend ${{ freight.images[1].tag }}"
+          message: "Coordinate api and migrations to pre-prod"
       - uses: git-push
         config:
           path: ./repo

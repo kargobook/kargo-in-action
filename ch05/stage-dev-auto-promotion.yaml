@@ -33,7 +33,7 @@ spec:
       - uses: git-commit
         config:
           path: ./repo
-          message: "Promote to dev: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}"
+          message: 'Promote to dev: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
       - uses: git-push
         config:
           path: ./repo

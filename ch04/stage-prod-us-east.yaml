@@ -1,5 +1,5 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
-# Section: 4.4.1 Parallel staging environments
+# Section: 4.4.1 Parallel pre-prod environments
 # Kargo version: 1.x
 # Status: VERIFIED
 
@@ -15,7 +15,7 @@ spec:
       name: demo-app
     sources:
       stages:
-      - staging-us                            # <1>
+      - pre-prod-us                            # <1>
   promotionTemplate:
     spec:
       vars:

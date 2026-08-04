@@ -10,14 +10,14 @@ steps:
   as: commit
   config:
     path: ./out
-    message: "chore: promote to staging"
+    message: "chore: promote to pre-prod"
 - uses: git-push
   config:
     path: ./out
 - uses: argocd-update
   config:
     apps:
-    - name: my-app-staging
+    - name: my-app-pre-prod
       sources:
       - repoURL: https://github.com/kargobook/demo-gitops.git
         desiredRevision: ${{ outputs['commit'].commit }}
@@ -25,7 +25,7 @@ steps:
   retry:
     timeout: 15m
   config:
-    url: https://staging.example.com/readiness
+    url: https://pre-prod.example.com/readiness
     successExpression: response.status == 200
     failureExpression: response.status == 500
 

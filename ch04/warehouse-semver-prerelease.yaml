@@ -3,4 +3,4 @@
 # Kargo version: 1.x
 # Status: VERIFIED
 
-semverConstraint: ">=1.2.0-rc.0 <1.2.0"   # <1>
+constraint: ">=1.2.0-rc.0 <1.2.0"   # <1>

@@ -1,12 +1,12 @@
-# Chapter: 3. Getting started with Kargo
-# Section: Defining the Stages
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.4.1 Parallel pre-prod environments
 # Kargo version: 1.x
-# Status: UNVERIFIED
+# Status: VERIFIED
 
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
-  name: staging
+  name: pre-prod-us
   namespace: demo
 spec:
   requestedFreight:
@@ -15,12 +15,12 @@ spec:
       name: demo-app
     sources:
       stages:
-      - dev
+      - dev                                   # <1>
   promotionTemplate:
     spec:
       vars:
         - name: gitRepo
-          value: https://github.com/<your-github-username>/demo-gitops.git
+          value: https://github.com/kargobook/demo-gitops.git
       steps:
       - uses: git-clone
         config:
@@ -30,7 +30,7 @@ spec:
             path: ./repo
       - uses: kustomize-set-image
         config:
-          path: ./repo/envs/staging
+          path: ./repo/envs/pre-prod-us        # <2>
           images:
           - image: ghcr.io/kargobook/demo-app
             tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
@@ -38,7 +38,7 @@ spec:
         as: commit
         config:
           path: ./repo
-          message: 'Promote to staging: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
+          message: 'Promote to pre-prod-us: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
       - uses: git-push
         config:
           path: ./repo
@@ -46,7 +46,6 @@ spec:
       - uses: argocd-update
         config:
           apps:
-          - name: demo-staging
+          - name: demo-pre-prod-us
             sources:
             - repoURL: ${{ vars.gitRepo }}
-

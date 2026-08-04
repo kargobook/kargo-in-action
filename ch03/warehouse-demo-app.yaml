@@ -12,5 +12,5 @@ spec:
   subscriptions:
   - image:
       repoURL: ghcr.io/kargobook/demo-app
-      semverConstraint: ">=1.0.0 <2.0.0"
+      constraint: ">=1.0.0 <2.0.0"
 

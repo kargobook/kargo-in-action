@@ -15,7 +15,7 @@ spec:
       name: demo-app
     sources:
       stages:
-      - staging
+      - pre-prod
       requiredSoakTime: 2h
   promotionTemplate:
     spec:
@@ -35,7 +35,7 @@ spec:
       - uses: git-commit
         config:
           path: ./repo
-          message: "Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}"
+          message: 'Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
       - uses: git-push
         config:
           path: ./repo

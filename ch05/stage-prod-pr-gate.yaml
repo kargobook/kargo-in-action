@@ -15,7 +15,7 @@ spec:
       name: demo-app
     sources:
       stages:
-      - staging
+      - pre-prod
   promotionTemplate:
     spec:
       steps:
@@ -35,18 +35,18 @@ spec:
         as: commit
         config:
           path: ./repo
-          message: "Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}"
+          message: 'Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
       - uses: git-open-pr
         as: open-pr
         config:
           repoURL: https://github.com/kargobook/demo-gitops.git
           sourceBranch: promote/prod-${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
           targetBranch: main
-          title: "Promote ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production"
+          title: 'Promote ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production'
           description: |
             Promotes ghcr.io/kargobook/demo-app:${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production.
 
-            Upstream stage: staging
+            Upstream stage: pre-prod
 
             Review the changes below and merge to approve the promotion.
       - uses: git-wait-for-pr

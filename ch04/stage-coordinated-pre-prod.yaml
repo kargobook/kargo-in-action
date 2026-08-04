@@ -6,7 +6,7 @@
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
-  name: staging
+  name: pre-prod
   namespace: kargobook-demo
 spec:
   requestedFreight:                                  # <1>
@@ -36,13 +36,13 @@ spec:
             path: ./repo
       - uses: kustomize-set-image
         config:
-          path: ./repo/apps/payments/envs/staging
+          path: ./repo/apps/payments/envs/pre-prod
           images:
           - image: ghcr.io/kargobook/payments-api
             tag: ${{ imageFrom("ghcr.io/kargobook/payments-api").Tag }}
       - uses: kustomize-set-image
         config:
-          path: ./repo/apps/auth/envs/staging
+          path: ./repo/apps/auth/envs/pre-prod
           images:
           - image: ghcr.io/kargobook/auth-service
             tag: ${{ imageFrom("ghcr.io/kargobook/auth-service").Tag }}
@@ -50,7 +50,7 @@ spec:
         as: commit
         config:
           path: ./repo
-          message: 'Promote payments-api and auth-service to staging'
+          message: 'Promote payments-api and auth-service to pre-prod'
       - uses: git-push
         config:
           path: ./repo
@@ -58,9 +58,9 @@ spec:
       - uses: argocd-update
         config:
           apps:
-          - name: payments-staging
+          - name: payments-pre-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
-          - name: auth-staging
+          - name: auth-pre-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}

@@ -31,10 +31,10 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: demo-staging
+  name: demo-pre-prod
   namespace: argocd
   annotations:
-    kargo.akuity.io/authorized-stage: demo:staging
+    kargo.akuity.io/authorized-stage: demo:pre-prod
   labels:
     kargo.akuity.io/project: demo
 spec:
@@ -42,10 +42,10 @@ spec:
   source:
     repoURL: https://github.com/<your-github-username>/demo-gitops.git
     targetRevision: main
-    path: envs/staging
+    path: envs/pre-prod
   destination:
     server: https://kubernetes.default.svc
-    namespace: demo-staging
+    namespace: demo-pre-prod
   syncPolicy:
     automated:
       prune: true

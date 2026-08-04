@@ -7,17 +7,17 @@
 service:
   name: payments
   imageRepo: ghcr.io/kargobook/payments-api
-  semverConstraint: ">=2.0.0 <3.0.0"
+  constraint: ">=2.0.0 <3.0.0"
 
 gitops:
   repoURL: https://github.com/kargobook/demo-gitops.git
   paths:
     dev: apps/payments/envs/dev
-    staging: apps/payments/envs/staging
+    pre-prod: apps/payments/envs/pre-prod
     prod: apps/payments/envs/prod
 
 promotion:
-  staging:
+  pre-prod:
     requirePullRequest: true
   prod:
     requirePullRequest: true

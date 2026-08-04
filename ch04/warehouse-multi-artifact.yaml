@@ -12,7 +12,7 @@ spec:
   subscriptions:                                     # <1>
   - image:
       repoURL: ghcr.io/kargobook/demo-app
-      semverConstraint: ^1.0.0
+      constraint: ^1.0.0
   - chart:                                           # <2>
       repoURL: oci://ghcr.io/kargobook/charts/demo-app
       semverConstraint: ^1.0.0

@@ -5,7 +5,7 @@
 
 - uses: yaml-update
   config:
-    path: ./repo/values-staging.yaml
+    path: ./repo/values-pre-prod.yaml
     updates:
     - key: image.tag
       value: ${{ imageFrom("registry.example.com/payments-api").Tag }}

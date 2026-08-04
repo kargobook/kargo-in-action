@@ -6,12 +6,12 @@
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
-  name: payments-staging
+  name: payments-pre-prod
   namespace: payments
 spec:
   subscriptions:
     upstreamStages:
-    - name: database-staging
+    - name: database-pre-prod
       namespace: infrastructure
   promotionTemplate:
     spec:
@@ -24,13 +24,13 @@ spec:
             path: ./repo
       - uses: kustomize-set-image
         config:
-          path: ./repo/apps/payments/envs/staging
+          path: ./repo/apps/payments/envs/pre-prod
           images:
           - image: ghcr.io/kargobook/payments-api
       - uses: git-commit
         config:
           path: ./repo
-          message: "Promote payments to staging: ${{ freight.images[0].tag }}"
+          message: "Promote payments to pre-prod: ${{ freight.images[0].tag }}"
       - uses: git-push
         config:
           path: ./repo
