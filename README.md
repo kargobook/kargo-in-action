@@ -35,6 +35,16 @@ helm push demo-app-<version>.tgz oci://ghcr.io/kargobook/charts
 
 You will need a Kubernetes cluster with Argo CD and Kargo installed; chapter 3 covers the full installation.
 
+## VERIFIED vs UNVERIFIED
+
+Every example file's header carries a `# Status:` marker. `VERIFIED` means CI
+(`.github/workflows/verify.yml`) applied the file to a real, pinned Kargo
+install with `kubectl apply --dry-run=server` and the API accepted it.
+`UNVERIFIED` means nobody has done that yet, and `PRE-RELEASE` means the
+feature the file demonstrates hasn't shipped. A file may be promoted from
+`UNVERIFIED` to `VERIFIED` only by a CI run, never by hand: if you fix an
+example, let the workflow re-verify it before flipping the marker.
+
 ## Feedback
 
 Found a problem with an example? Please open an issue. Book feedback goes through the Manning liveBook forum.

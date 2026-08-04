@@ -1,7 +1,7 @@
 # Chapter: 3. Getting started with Kargo
 # Section: The core resource model
 # Kargo version: 1.11.0
-# Status: VERIFIED
+# Status: UNVERIFIED
 #
 # This file is illustrative only. Freight is created by Kargo's Warehouse
 # controller; you do not author Freight by hand. Shown here to make the

@@ -1,0 +1,131 @@
+name: verify
+on: [push, pull_request]
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Parse every YAML file
+      run: |
+        python3 -m pip install --quiet pyyaml
+        python3 - <<'PY'
+        import glob, sys, yaml
+        bad = []
+        files = sorted(glob.glob("**/*.yaml", recursive=True))
+        for path in files:
+            try:
+                list(yaml.safe_load_all(open(path, encoding="utf-8")))
+            except yaml.YAMLError as err:
+                bad.append(f"{path}: {str(err).splitlines()[0]}")
+        for line in bad:
+            print(line, file=sys.stderr)
+        print(f"{len(files)} files, {len(bad)} failures")
+        sys.exit(1 if bad else 0)
+        PY
+
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Create a cluster
+      uses: helm/kind-action@v1
+    - name: Install cert-manager and Kargo
+      run: |
+        helm install cert-manager oci://quay.io/jetstack/charts/cert-manager \
+          --namespace cert-manager --create-namespace --set crds.enabled=true --wait
+        helm install kargo oci://ghcr.io/akuity/kargo-charts/kargo \
+          --namespace kargo --create-namespace \
+          --set api.adminAccount.passwordHash='$2a$10$placeholderplaceholderplaceholderplaceholderplaceholder' \
+          --set api.adminAccount.tokenSigningKey=ci-signing-key \
+          --wait
+        kubectl get crds | grep kargo
+    - name: Server-side dry-run every manifest
+      run: |
+        kubectl create namespace demo
+        kubectl create namespace kargobook-demo
+
+        # Files below are intentionally excluded from the dry-run loop. Each
+        # one legitimately cannot pass `kubectl apply --dry-run=server` in
+        # this bare cluster (Kargo + cert-manager only, no Argo CD, no Argo
+        # Rollouts, no pre-existing Warehouses/Freight) for a structural
+        # reason, not a content bug. Do not add a file here to silence a
+        # real failure; every entry must have a reason a reviewer can check.
+        #
+        # ch03/git-credentials-secret.yaml
+        #   Contains credential-shaped placeholder material. Excluded from
+        #   automated apply entirely; handled separately, out of scope for
+        #   this CI check.
+        # ch03/kustomization-dev.yaml
+        #   `kind: Kustomization` is a Kustomize build file, not a
+        #   Kubernetes API resource. There is no CRD for it; the API server
+        #   would reject it with "no matches for kind". Build it with
+        #   `kubectl kustomize` / `kustomize build`, not `kubectl apply`.
+        # ch03/argocd-apps.yaml
+        #   Requires Argo CD's `Application` CRD (argoproj.io/v1alpha1).
+        #   This job installs only cert-manager and Kargo, so that CRD does
+        #   not exist here.
+        # ch03/analysistemplate-smoke.yaml
+        #   Requires Argo Rollouts' `AnalysisTemplate` CRD
+        #   (argoproj.io/v1alpha1), which is likewise not installed here.
+        # ch03/freight-example.yaml
+        #   Documented in its own header as illustrative only: Freight is
+        #   created by the Warehouse controller, never authored by hand.
+        #   Its `metadata.name` is a content hash Kargo itself computes; a
+        #   hand-typed value has no controller-created Warehouse behind it
+        #   to match against.
+        # ch03/promotion-example.yaml
+        #   Documented in its own header as illustrative: it shows what
+        #   Kargo persists in `status` *after* a promotion runs. `status`
+        #   is a status subresource that a plain `apply` cannot set, and it
+        #   references a Freight digest that was never created in this
+        #   cluster.
+        # ch04/warehouse-git-subscription.yaml
+        # ch04/warehouse-helm-subscription.yaml
+        # ch04/warehouse-image-subscription.yaml
+        # ch04/warehouse-semver-prerelease.yaml
+        #   Each is a bare `spec:`/field fragment used to show one
+        #   subscription shape in isolation. None has `apiVersion`/`kind`,
+        #   so the API server has nothing to validate against. Meant to be
+        #   read and merged into a full Warehouse manifest, not applied.
+        # ch04/stage-pre-prod-from-smoke.yaml
+        # ch04/stage-prod-from-rc.yaml
+        #   Same pattern: fragments showing only the `requestedFreight`
+        #   delta, explicitly labeled "Fragment... merge into your full
+        #   Stage manifest" in the file's own header comment.
+        SKIP_FILES=(
+          "ch03/git-credentials-secret.yaml"
+          "ch03/kustomization-dev.yaml"
+          "ch03/argocd-apps.yaml"
+          "ch03/analysistemplate-smoke.yaml"
+          "ch03/freight-example.yaml"
+          "ch03/promotion-example.yaml"
+          "ch04/warehouse-git-subscription.yaml"
+          "ch04/warehouse-helm-subscription.yaml"
+          "ch04/warehouse-image-subscription.yaml"
+          "ch04/warehouse-semver-prerelease.yaml"
+          "ch04/stage-pre-prod-from-smoke.yaml"
+          "ch04/stage-prod-from-rc.yaml"
+        )
+
+        should_skip() {
+          local target="$1"
+          for skip in "${SKIP_FILES[@]}"; do
+            [[ "$target" == "$skip" ]] && return 0
+          done
+          return 1
+        }
+
+        fail=0
+        for f in $(find ch03 ch04 -name '*.yaml' | sort); do
+          if should_skip "$f"; then
+            echo "SKIP $f"
+            continue
+          fi
+          if ! kubectl apply --dry-run=server -f "$f" >/dev/null 2>err.txt; then
+            echo "FAIL $f"; cat err.txt; fail=1
+          else
+            echo "OK $f"
+          fi
+        done
+        exit $fail

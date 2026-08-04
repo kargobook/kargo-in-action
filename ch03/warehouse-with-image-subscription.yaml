@@ -1,7 +1,7 @@
 # Chapter: 3. Getting started with Kargo
 # Section: The core resource model
-# Kargo version: 1.x
-# Status: VERIFIED
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
 # Source: https://github.com/kargobook/demo-gitops/blob/main/setup/04-warehouse.yaml
 
 apiVersion: kargo.akuity.io/v1alpha1

@@ -1,7 +1,7 @@
 # Chapter: 3. Getting started with Kargo
 # Section: Defining the Stages
 # Kargo version: 1.11.0
-# Status: VERIFIED
+# Status: UNVERIFIED
 # Source: https://github.com/kargobook/demo-gitops/blob/main/setup/07-stage-prod.yaml
 
 apiVersion: kargo.akuity.io/v1alpha1

@@ -1,7 +1,7 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.1.1 Subscription types
-# Kargo version: 1.x
-# Status: VERIFIED
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
 
 spec:
   subscriptions:

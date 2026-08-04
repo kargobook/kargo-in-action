@@ -1,6 +1,6 @@
 # Chapter: 3. Getting started with Kargo
 # Section: Preparing the GitOps repository
-# Kargo version: 1.x
+# Kargo version: 1.11.0
 # Status: UNVERIFIED
 
 apiVersion: kustomize.config.k8s.io/v1beta1
