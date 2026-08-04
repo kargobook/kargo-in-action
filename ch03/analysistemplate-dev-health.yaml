@@ -1,0 +1,31 @@
+# Chapter: 3. Getting started with Kargo
+# Section: 3.2 The core resource model
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
+#
+# Probes the dev environment, the only namespace chapter 3 creates for
+# demo-app besides demo-pre-prod and demo-prod. Chapter 4's smoke Stage
+# uses the same shape against demo-smoke: see
+# ch04/analysistemplate-smoke-health.yaml.
+#
+# `result` is the value the web provider extracts from the response BODY at
+# `jsonPath`, not the HTTP status code, so the condition asserts on the body
+# demo-app's /healthz returns: {"status": "healthy"}.
+
+# tag::content[]
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: dev-health
+  namespace: demo
+spec:
+  metrics:
+  - name: http-ok
+    count: 3
+    interval: 20s
+    successCondition: result == "healthy"
+    provider:
+      web:
+        url: http://demo-app.demo-dev.svc.cluster.local/healthz
+        jsonPath: "{$.status}"
+# end::content[]

@@ -7,9 +7,9 @@ spec:
   subscriptions:
   - image:
       repoURL: ghcr.io/kargobook/demo-app                 # <1>
-      constraint: ">=1.0.0 <2.0.0"                # <2>
-      ignoreTagsRegexes:                                       # <3>
+      constraint: ">=1.0.0 <2.0.0"                        # <2>
+      ignoreTagsRegexes:                                  # <3>
       - latest
       - dev
       - ".*-rc.*"
-      platform: linux/amd64                             # <4>
+      platform: linux/amd64                               # <4>

@@ -30,7 +30,7 @@ spec:
             path: ./repo
       - uses: kustomize-set-image
         config:
-          path: ./repo/envs/rc                # <2>
+          path: ./repo/envs/rc                 # <2>
           images:
           - image: ghcr.io/kargobook/demo-app
             digest: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}

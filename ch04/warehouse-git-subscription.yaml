@@ -6,7 +6,7 @@
 spec:
   subscriptions:
   - git:
-      repoURL: https://github.com/kargobook/demo-gitops.git   # <1>
+      repoURL: https://github.com/kargobook/demo-gitops.git     # <1>
       branch: main                                              # <2>
       includePaths:                                             # <3>
       - "infra/database/**"

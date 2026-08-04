@@ -81,9 +81,19 @@ jobs:
         #   Requires Argo CD's `Application` CRD (argoproj.io/v1alpha1).
         #   This job installs only cert-manager and Kargo, so that CRD does
         #   not exist here.
-        # ch03/analysistemplate-smoke.yaml
-        #   Requires Argo Rollouts' `AnalysisTemplate` CRD
+        # ch03/analysistemplate-dev-health.yaml
+        # ch04/analysistemplate-smoke-health.yaml
+        #   Require Argo Rollouts' `AnalysisTemplate` CRD
         #   (argoproj.io/v1alpha1), which is likewise not installed here.
+        #   Two templates, not one: each names a fixed probe URL, and the
+        #   namespaces differ (demo-dev in ch3, demo-smoke in ch4, which ch3
+        #   never creates).
+        # ch03/stage-dev-verification.yaml
+        #   A `spec:`-only fragment showing where the `verification` block
+        #   sits; no apiVersion/kind, so there is nothing for the API server
+        #   to validate. It used to be a complete Stage named `dev` with an
+        #   empty `promotionTemplate.spec`, which the CRD accepts and which
+        #   would have wiped the live dev Stage's promotion steps on apply.
         # ch03/freight-example.yaml
         #   Documented in its own header as illustrative only: Freight is
         #   created by the Warehouse controller, never authored by hand.
@@ -122,7 +132,9 @@ jobs:
           "ch03/git-credentials-secret.yaml"
           "ch03/kustomization-dev.yaml"
           "ch03/argocd-apps.yaml"
-          "ch03/analysistemplate-smoke.yaml"
+          "ch03/analysistemplate-dev-health.yaml"
+          "ch03/stage-dev-verification.yaml"
+          "ch04/analysistemplate-smoke-health.yaml"
           "ch03/freight-example.yaml"
           "ch03/promotion-example.yaml"
           "ch04/warehouse-git-subscription.yaml"

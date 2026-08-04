@@ -2,13 +2,20 @@
 # Section: 3.2 The core resource model
 # Kargo version: 1.11.0
 # Status: UNVERIFIED
+#
+# ILLUSTRATIVE - DO NOT APPLY. Fragment showing only the `verification` block
+# a Stage gains, and where it sits among the fields the dev Stage already has.
+# Merge it into your full Stage manifest; there is no apiVersion/kind here, so
+# `kubectl apply` has nothing to act on. (Same convention as
+# ch04/warehouse-git-subscription.yaml and the other subscription fragments.)
+#
+# This file previously carried `apiVersion`/`kind`/`metadata.name: dev`, plus a
+# `promotionTemplate.spec` whose only content was a comment. That parses as
+# null, `steps` is `omitempty`, and the CRD accepts it, so applying it would
+# have stripped the promotion steps off the live `dev` Stage and every later
+# Promotion would have been rejected for having no steps.
 
 # tag::content[]
-apiVersion: kargo.akuity.io/v1alpha1
-kind: Stage
-metadata:
-  name: dev
-  namespace: demo
 spec:
   requestedFreight:
   - origin:
@@ -18,8 +25,8 @@ spec:
       direct: true
   verification:
     analysisTemplates:
-    - name: smoke-health                     # <1>
+    - name: dev-health                       # <1>
   promotionTemplate:
     spec:
-      # ... steps as in the dev Stage above
+      # ... steps unchanged from the dev Stage above
 # end::content[]

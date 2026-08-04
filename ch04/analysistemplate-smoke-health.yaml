@@ -1,0 +1,31 @@
+# Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
+# Section: 4.3 From pipelines to Stage graphs
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
+#
+# The template the smoke Stage in ch04/stage-smoke.yaml names. Same shape as
+# ch03/analysistemplate-dev-health.yaml, pointed at demo-smoke, the namespace
+# the smoke overlay deploys into. Chapter 3 never creates that namespace, which
+# is why the two chapters carry separate templates.
+#
+# `result` is the value the web provider extracts from the response BODY at
+# `jsonPath`, not the HTTP status code, so the condition asserts on the body
+# demo-app's /healthz returns: {"status": "healthy"}.
+
+# tag::content[]
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: smoke-health
+  namespace: demo
+spec:
+  metrics:
+  - name: http-ok
+    count: 3
+    interval: 20s
+    successCondition: result == "healthy"
+    provider:
+      web:
+        url: http://demo-app.demo-smoke.svc.cluster.local/healthz
+        jsonPath: "{$.status}"
+# end::content[]
