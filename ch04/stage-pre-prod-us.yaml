@@ -1,6 +1,6 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.4.1 Parallel pre-prod environments
-# Kargo version: 1.x
+# Kargo version: 1.11.0
 # Status: VERIFIED
 
 apiVersion: kargo.akuity.io/v1alpha1
@@ -33,7 +33,7 @@ spec:
           path: ./repo/envs/pre-prod-us        # <2>
           images:
           - image: ghcr.io/kargobook/demo-app
-            tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+            digest: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
       - uses: git-commit
         as: commit
         config:
@@ -49,3 +49,4 @@ spec:
           - name: demo-pre-prod-us
             sources:
             - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs['commit'].commit }}

@@ -1,6 +1,6 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.4.4 Multi-service Stage graphs
-# Kargo version: 1.x
+# Kargo version: 1.11.0
 # Status: VERIFIED
 
 apiVersion: kargo.akuity.io/v1alpha1
@@ -39,13 +39,13 @@ spec:
           path: ./repo/apps/payments/envs/pre-prod
           images:
           - image: ghcr.io/kargobook/payments-api
-            tag: ${{ imageFrom("ghcr.io/kargobook/payments-api").Tag }}
+            digest: ${{ imageFrom("ghcr.io/kargobook/payments-api").Digest }}
       - uses: kustomize-set-image
         config:
           path: ./repo/apps/auth/envs/pre-prod
           images:
           - image: ghcr.io/kargobook/auth-service
-            tag: ${{ imageFrom("ghcr.io/kargobook/auth-service").Tag }}
+            digest: ${{ imageFrom("ghcr.io/kargobook/auth-service").Digest }}
       - uses: git-commit                             # <3>
         as: commit
         config:
@@ -61,6 +61,8 @@ spec:
           - name: payments-pre-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs['commit'].commit }}
           - name: auth-pre-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs['commit'].commit }}

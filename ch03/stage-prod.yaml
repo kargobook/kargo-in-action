@@ -1,6 +1,6 @@
 # Chapter: 3. Getting started with Kargo
 # Section: Defining the Stages
-# Kargo version: 1.x
+# Kargo version: 1.11.0
 # Status: VERIFIED
 # Source: https://github.com/kargobook/demo-gitops/blob/main/setup/07-stage-prod.yaml
 
@@ -34,7 +34,7 @@ spec:
           path: ./repo/envs/prod
           images:
           - image: ghcr.io/kargobook/demo-app
-            tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+            digest: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
       - uses: git-commit
         as: commit
         config:
@@ -50,3 +50,4 @@ spec:
           - name: demo-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs['commit'].commit }}
