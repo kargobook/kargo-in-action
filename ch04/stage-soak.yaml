@@ -16,6 +16,7 @@ spec:
     sources:
       stages:
       - pre-prod                               # <1>
+      requiredSoakTime: 24h                    # <2>
   promotionTemplate:
     spec:
       vars:
@@ -30,7 +31,7 @@ spec:
             path: ./repo
       - uses: kustomize-set-image
         config:
-          path: ./repo/envs/soak              # <2>
+          path: ./repo/envs/soak              # <3>
           images:
           - image: ghcr.io/kargobook/demo-app
             digest: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
