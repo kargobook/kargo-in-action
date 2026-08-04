@@ -42,8 +42,24 @@ jobs:
         kubectl get crds | grep kargo
     - name: Server-side dry-run every manifest
       run: |
-        kubectl create namespace demo
-        kubectl create namespace kargobook-demo
+        # A bare `kubectl create namespace` is not enough: Kargo's admission
+        # webhook rejects Stages/Warehouses in a namespace unless it was
+        # provisioned by a real (non-dry-run) Project apply, which is what
+        # labels the namespace `kargo.akuity.io/project: "true"`. Verified
+        # locally against a real Kargo 1.11.0 install: dry-running a Stage
+        # against a `kubectl create namespace`-only namespace fails with
+        # `namespace "demo" is not a project`.
+        kubectl apply -f ch03/project-demo.yaml
+        # No book example defines a Project named kargobook-demo (only
+        # ch04/stage-coordinated-pre-prod.yaml and
+        # ch04/warehouse-multi-artifact.yaml use that namespace); this
+        # Project is CI scaffolding only, not sourced from the book.
+        cat <<'PROJECT' | kubectl apply -f -
+        apiVersion: kargo.akuity.io/v1alpha1
+        kind: Project
+        metadata:
+          name: kargobook-demo
+        PROJECT
 
         # Files below are intentionally excluded from the dry-run loop. Each
         # one legitimately cannot pass `kubectl apply --dry-run=server` in
@@ -93,6 +109,15 @@ jobs:
         #   Same pattern: fragments showing only the `requestedFreight`
         #   delta, explicitly labeled "Fragment... merge into your full
         #   Stage manifest" in the file's own header comment.
+        #
+        # ch03/project-with-rbac.yaml is deliberately NOT in this list. Its
+        # `kind: Project` with a `spec.promotionPolicies` block was verified
+        # locally to fail against a real Kargo 1.11.0 install with "strict
+        # decoding error: unknown field spec" -- `kubectl explain
+        # project.spec` confirms Project has no spec field at all in 1.11;
+        # promotionPolicies lives on ProjectConfig instead. That is a real
+        # content bug, not an environment gap, so it should keep failing
+        # here until the example is rewritten.
         SKIP_FILES=(
           "ch03/git-credentials-secret.yaml"
           "ch03/kustomization-dev.yaml"
