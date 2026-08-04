@@ -19,7 +19,7 @@ spec:
       - dev                                   # <1>
   verification:
     analysisTemplates:
-    - name: smoke-health                     # <2>
+    - name: smoke-health                      # <2>
   promotionTemplate:
     spec:
       vars:
