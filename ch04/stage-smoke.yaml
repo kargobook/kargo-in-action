@@ -3,6 +3,7 @@
 # Kargo version: 1.11.0
 # Status: VERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
@@ -16,6 +17,9 @@ spec:
     sources:
       stages:
       - dev                                   # <1>
+  verification:
+    analysisTemplates:
+    - name: smoke-health                     # <2>
   promotionTemplate:
     spec:
       vars:
@@ -30,7 +34,7 @@ spec:
             path: ./repo
       - uses: kustomize-set-image
         config:
-          path: ./repo/envs/smoke             # <2>
+          path: ./repo/envs/smoke             # <3>
           images:
           - image: ghcr.io/kargobook/demo-app
             digest: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
@@ -50,3 +54,4 @@ spec:
             sources:
             - repoURL: ${{ vars.gitRepo }}
               desiredRevision: ${{ outputs['commit'].commit }}
+# end::content[]

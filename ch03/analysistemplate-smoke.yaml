@@ -1,0 +1,22 @@
+# Chapter: 3. Getting started with Kargo
+# Section: 3.2 The core resource model
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
+
+# tag::content[]
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: smoke-health
+  namespace: demo
+spec:
+  metrics:
+  - name: http-ok
+    count: 3
+    interval: 20s
+    successCondition: result == "200"
+    provider:
+      web:
+        url: http://demo-app.demo-smoke.svc.cluster.local/healthz
+        jsonPath: "{$.status}"
+# end::content[]

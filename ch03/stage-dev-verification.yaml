@@ -1,0 +1,25 @@
+# Chapter: 3. Getting started with Kargo
+# Section: 3.2 The core resource model
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
+
+# tag::content[]
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: dev
+  namespace: demo
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: demo-app
+    sources:
+      direct: true
+  verification:
+    analysisTemplates:
+    - name: smoke-health                     # <1>
+  promotionTemplate:
+    spec:
+      # ... steps as in the dev Stage above
+# end::content[]
