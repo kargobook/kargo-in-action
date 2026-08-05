@@ -10,7 +10,10 @@
 # convention, <stage>.<ULID>.<freight-name-prefix>: see the "Working with
 # Stages" and "Verification" how-to guides at
 # https://docs.kargo.io/user-guide/how-to-guides/ for real examples of
-# this shape.
+# this shape. status.freightCollection.items is trimmed to just the `name`
+# field per entry for readability; a real entry also carries the origin
+# Freight's commits/images/charts detail, and the collection itself carries
+# an `id` hash that is omitted here for the same reason.
 
 # tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
@@ -25,4 +28,8 @@ status:
   phase: Succeeded
   startedAt: "2026-05-25T14:22:01Z"
   finishedAt: "2026-05-25T14:22:28Z"
+  freightCollection:
+    items:
+      Warehouse/demo-app:
+        name: 666209fd9755a1e48bec6b27f5f447747410dd9e
 # end::content[]
