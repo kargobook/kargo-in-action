@@ -17,7 +17,8 @@ rules:
   verbs: ["get", "list", "watch", "create"]
 - apiGroups: ["kargo.akuity.io"]
   resources: ["stages"]
-  verbs: ["promote"]                     # Kargo's custom verb; no resourceNames means any Stage in this namespace
+  # Kargo's custom verb. No resourceNames means any Stage in this namespace.
+  verbs: ["promote"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
