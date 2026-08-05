@@ -1,0 +1,66 @@
+# Chapter: 7. Multi-Service and Multi-Team Patterns
+# Section: Isolating teams with per-Project namespaces and RBAC
+# Kargo version: 1.11.0
+# Status: UNVERIFIED
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: promoter-lower
+  namespace: payments
+rules:
+- apiGroups: ["kargo.akuity.io"]
+  resources: ["promotions"]
+  verbs: ["get", "list", "watch", "create"]
+- apiGroups: ["kargo.akuity.io"]
+  resources: ["stages"]
+  verbs: ["promote"]
+  resourceNames: ["payments-dev", "payments-pre-prod"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: payments-team-lower-promoters
+  namespace: payments
+subjects:
+- kind: Group
+  name: payments-team
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: promoter-lower
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: promoter-prod
+  namespace: payments
+rules:
+- apiGroups: ["kargo.akuity.io"]
+  resources: ["promotions"]
+  verbs: ["get", "list", "watch", "create"]
+- apiGroups: ["kargo.akuity.io"]
+  resources: ["stages"]
+  verbs: ["promote"]
+  resourceNames: ["payments-prod"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: payments-prod-promoters
+  namespace: payments
+subjects:
+- kind: User
+  name: alice
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: carol
+  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: payments-release-bot
+  namespace: payments
+roleRef:
+  kind: Role
+  name: promoter-prod
+  apiGroup: rbac.authorization.k8s.io
