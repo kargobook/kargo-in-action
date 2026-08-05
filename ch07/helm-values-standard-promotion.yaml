@@ -21,7 +21,4 @@ promotion:
     requirePullRequest: true
   prod:
     requirePullRequest: true
-    authorizedPromoters:
-    - alice
-    - carol
 

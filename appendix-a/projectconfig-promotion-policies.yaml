@@ -1,0 +1,15 @@
+# Chapter: Appendix A. Kargo Resource Reference
+# Section: ProjectConfig
+# Kargo version: 1.11.0
+# Status: VERIFIED
+
+apiVersion: kargo.akuity.io/v1alpha1
+kind: ProjectConfig
+metadata:
+  name: payments
+  namespace: payments
+spec:
+  promotionPolicies:
+  - stageSelector:
+      name: payments-dev
+    autoPromotionEnabled: true
