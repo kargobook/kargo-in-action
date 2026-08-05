@@ -3,13 +3,21 @@
 # Kargo version: 1.11.0
 # Status: UNVERIFIED
 
-# Kargo's API server authorizes an SSO user as the claim-annotated
-# ServiceAccounts whose claims match that user's token, not as a bare
-# Kubernetes User, so each tier needs one ServiceAccount to bind.
+# The release bot's own identity. It authenticates with this
+# ServiceAccount's token, so it needs no claim annotation.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: payments-promoters
+  name: payments-release-bot
+  namespace: payments
+---
+# Kargo's API server authorizes an SSO caller as the claim-annotated
+# ServiceAccounts whose claims match that caller's token, never as the
+# person. These two carry the claims for each tier.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: payments-team-sso
   namespace: payments
   annotations:
     rbac.kargo.akuity.io/claims: '{"groups":["payments-team"]}'
@@ -17,7 +25,7 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: payments-prod-promoters
+  name: payments-prod-sso
   namespace: payments
   annotations:
     rbac.kargo.akuity.io/claims: '{"sub":["alice","carol"]}'
@@ -32,15 +40,18 @@ metadata:
   name: payments-promoter-viewers
   namespace: payments
 subjects:
-- kind: ServiceAccount
-  name: payments-promoters
+- kind: ServiceAccount        # the UI and kargo CLI path
+  name: payments-team-sso
   namespace: payments
 - kind: ServiceAccount
-  name: payments-prod-promoters
+  name: payments-prod-sso
   namespace: payments
 - kind: ServiceAccount
   name: payments-release-bot
   namespace: payments
+- kind: Group                 # the direct kubectl path
+  name: payments-team
+  apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: kargo-viewer
@@ -61,15 +72,19 @@ rules:
   verbs: ["promote"]
   resourceNames: ["payments-dev", "payments-pre-prod"]
 ---
+# Both subject forms, because the two paths match different ones.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: payments-team-lower-promoters
   namespace: payments
 subjects:
-- kind: ServiceAccount
-  name: payments-promoters
+- kind: ServiceAccount        # the UI and kargo CLI path
+  name: payments-team-sso
   namespace: payments
+- kind: Group                 # the direct kubectl path
+  name: payments-team
+  apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: promoter-lower
@@ -96,12 +111,18 @@ metadata:
   name: payments-prod-promoters
   namespace: payments
 subjects:
-- kind: ServiceAccount
-  name: payments-prod-promoters
+- kind: ServiceAccount        # the UI and kargo CLI path
+  name: payments-prod-sso
   namespace: payments
 - kind: ServiceAccount
   name: payments-release-bot
   namespace: payments
+- kind: User                  # the direct kubectl path
+  name: alice
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: carol
+  apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: promoter-prod
