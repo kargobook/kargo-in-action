@@ -3,6 +3,15 @@
 # Kargo version: 1.11.0
 # Status: UNVERIFIED
 #
+# Exercised by hand on 2026-08-04 against a kind cluster running Kargo 1.11.0
+# and Argo Rollouts 1.9.1: `kubectl apply` and `kubectl apply
+# --dry-run=server` both accept it. Its sibling
+# ch03/analysistemplate-dev-health.yaml, identical but for the probe URL, was
+# additionally driven to a `Successful` AnalysisRun by a live Stage. Still
+# UNVERIFIED on purpose: by the companion repo's README.md rule only a CI run
+# may set VERIFIED, and its verify.yml now installs Argo Rollouts and includes
+# this file in the dry-run loop, so the next CI run is what flips the marker.
+#
 # The template the smoke Stage in ch04/stage-smoke.yaml names. Same shape as
 # ch03/analysistemplate-dev-health.yaml, pointed at demo-smoke, the namespace
 # the smoke overlay deploys into. Chapter 3 never creates that namespace, which

@@ -30,16 +30,29 @@ jobs:
     - uses: actions/checkout@v4
     - name: Create a cluster
       uses: helm/kind-action@v1
-    - name: Install cert-manager and Kargo
+    - name: Install cert-manager, Argo Rollouts, and Kargo
       run: |
         helm install cert-manager oci://quay.io/jetstack/charts/cert-manager \
           --namespace cert-manager --create-namespace --set crds.enabled=true --wait
+        # Argo Rollouts CRDs and controller must exist *before* Kargo starts.
+        # Kargo's controller checks for the AnalysisTemplate/AnalysisRun CRDs
+        # once, at its own startup, and disables Rollouts integration for the
+        # life of that process if they're missing at that moment. Verified
+        # locally against a real Kargo 1.11.0 + Argo Rollouts 1.9.1 install:
+        # installing the CRDs alone left an AnalysisRun stuck with no phase
+        # forever (nothing reconciles it); only after the Argo Rollouts
+        # controller was also running did the Job run and the AnalysisRun
+        # reach `Successful`.
+        kubectl create namespace argo-rollouts
+        kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/download/v1.9.1/install.yaml
+        kubectl wait --for=condition=Available deployment/argo-rollouts -n argo-rollouts --timeout=120s
         helm install kargo oci://ghcr.io/akuity/kargo-charts/kargo \
           --namespace kargo --create-namespace \
           --set api.adminAccount.passwordHash='$2a$10$placeholderplaceholderplaceholderplaceholderplaceholder' \
           --set api.adminAccount.tokenSigningKey=ci-signing-key \
           --wait
         kubectl get crds | grep kargo
+        kubectl get crds | grep argoproj
     - name: Server-side dry-run every manifest
       run: |
         # A bare `kubectl create namespace` is not enough: Kargo's admission
@@ -63,10 +76,10 @@ jobs:
 
         # Files below are intentionally excluded from the dry-run loop. Each
         # one legitimately cannot pass `kubectl apply --dry-run=server` in
-        # this bare cluster (Kargo + cert-manager only, no Argo CD, no Argo
-        # Rollouts, no pre-existing Warehouses/Freight) for a structural
-        # reason, not a content bug. Do not add a file here to silence a
-        # real failure; every entry must have a reason a reviewer can check.
+        # this cluster (Kargo, cert-manager, and Argo Rollouts, but no Argo
+        # CD, no pre-existing Warehouses/Freight) for a structural reason,
+        # not a content bug. Do not add a file here to silence a real
+        # failure; every entry must have a reason a reviewer can check.
         #
         # ch03/git-credentials-secret.yaml
         #   Contains credential-shaped placeholder material. Excluded from
@@ -78,16 +91,11 @@ jobs:
         #   would reject it with "no matches for kind". Build it with
         #   `kubectl kustomize` / `kustomize build`, not `kubectl apply`.
         # ch03/argocd-apps.yaml
-        #   Requires Argo CD's `Application` CRD (argoproj.io/v1alpha1).
-        #   This job installs only cert-manager and Kargo, so that CRD does
-        #   not exist here.
-        # ch03/analysistemplate-dev-health.yaml
-        # ch04/analysistemplate-smoke-health.yaml
-        #   Require Argo Rollouts' `AnalysisTemplate` CRD
-        #   (argoproj.io/v1alpha1), which is likewise not installed here.
-        #   Two templates, not one: each names a fixed probe URL, and the
-        #   namespaces differ (demo-dev in ch3, demo-smoke in ch4, which ch3
-        #   never creates).
+        #   Requires Argo CD's `Application` CRD. Note that Argo CD and Argo
+        #   Rollouts share the `argoproj.io` API group but ship disjoint CRD
+        #   sets, so installing Argo Rollouts below does not supply
+        #   `applications.argoproj.io`. This job installs no Argo CD, so that
+        #   CRD does not exist here.
         # ch03/stage-dev-verification.yaml
         #   A `spec:`-only fragment showing where the `verification` block
         #   sits; no apiVersion/kind, so there is nothing for the API server
@@ -132,9 +140,7 @@ jobs:
           "ch03/git-credentials-secret.yaml"
           "ch03/kustomization-dev.yaml"
           "ch03/argocd-apps.yaml"
-          "ch03/analysistemplate-dev-health.yaml"
           "ch03/stage-dev-verification.yaml"
-          "ch04/analysistemplate-smoke-health.yaml"
           "ch03/freight-example.yaml"
           "ch03/promotion-example.yaml"
           "ch04/warehouse-git-subscription.yaml"

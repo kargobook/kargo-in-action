@@ -3,6 +3,14 @@
 # Kargo version: 1.11.0
 # Status: UNVERIFIED
 #
+# Exercised by hand on 2026-08-04 against a kind cluster running Kargo 1.11.0
+# and Argo Rollouts 1.9.1: the file applies cleanly, and a dev Stage naming it
+# drove an AnalysisRun to `Successful` (status.runSummary {"count":1,
+# "successful":1}; three `http-ok` curl Jobs Complete). Still UNVERIFIED on
+# purpose: by the companion repo's README.md rule only a CI run may set
+# VERIFIED, and its verify.yml now installs Argo Rollouts and includes this
+# file in the dry-run loop, so the next CI run is what flips the marker.
+#
 # Probes the dev environment, the only namespace chapter 3 creates for
 # demo-app besides demo-pre-prod and demo-prod. Chapter 4's smoke Stage
 # uses the same shape against demo-smoke: see
