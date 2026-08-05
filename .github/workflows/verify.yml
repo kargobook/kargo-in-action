@@ -37,6 +37,26 @@ jobs:
         sys.exit(1 if bad else 0)
         PY
 
+  semver-claim:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+        cache-dependency-path: tests/semver-prerelease-constraint/go.sum
+    - name: Verify the ch04 pre-release constraint claim
+      working-directory: tests/semver-prerelease-constraint
+      env:
+        # The Kargo release the book is written against. TestSemverVersionMatchesKargo
+        # compares this module's Masterminds/semver pin against Kargo's own, so the
+        # test keeps describing Kargo's behavior and not just a local pin.
+        KARGO_VERSION: v1.11.0
+      run: |
+        curl -fsSL -o /tmp/kargo-go.mod \
+          "https://raw.githubusercontent.com/akuity/kargo/${KARGO_VERSION}/go.mod"
+        KARGO_GO_MOD=/tmp/kargo-go.mod go test -count=1 -v ./...
+
   apply:
     runs-on: ubuntu-latest
     steps:

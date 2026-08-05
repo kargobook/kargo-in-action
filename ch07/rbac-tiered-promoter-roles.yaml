@@ -3,6 +3,50 @@
 # Kargo version: 1.11.0
 # Status: UNVERIFIED
 
+# Kargo's API server authorizes an SSO user as the claim-annotated
+# ServiceAccounts whose claims match that user's token, not as a bare
+# Kubernetes User, so each tier needs one ServiceAccount to bind.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: payments-promoters
+  namespace: payments
+  annotations:
+    rbac.kargo.akuity.io/claims: '{"groups":["payments-team"]}'
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: payments-prod-promoters
+  namespace: payments
+  annotations:
+    rbac.kargo.akuity.io/claims: '{"sub":["alice","carol"]}'
+---
+# Read access for every promoter, from kargo-viewer: the built-in Role
+# Kargo creates in each Project namespace. Without it, these subjects can
+# promote but can't list Stages or Freight, so they can't see what to
+# promote and the UI's Stage view stays empty.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: payments-promoter-viewers
+  namespace: payments
+subjects:
+- kind: ServiceAccount
+  name: payments-promoters
+  namespace: payments
+- kind: ServiceAccount
+  name: payments-prod-promoters
+  namespace: payments
+- kind: ServiceAccount
+  name: payments-release-bot
+  namespace: payments
+roleRef:
+  kind: Role
+  name: kargo-viewer
+  apiGroup: rbac.authorization.k8s.io
+---
+# Tier 1: the whole team may promote into the two lower Stages.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -23,14 +67,15 @@ metadata:
   name: payments-team-lower-promoters
   namespace: payments
 subjects:
-- kind: Group
-  name: payments-team
-  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: payments-promoters
+  namespace: payments
 roleRef:
   kind: Role
   name: promoter-lower
   apiGroup: rbac.authorization.k8s.io
 ---
+# Tier 2: production, restricted to two named approvers and the release bot.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -51,12 +96,9 @@ metadata:
   name: payments-prod-promoters
   namespace: payments
 subjects:
-- kind: User
-  name: alice
-  apiGroup: rbac.authorization.k8s.io
-- kind: User
-  name: carol
-  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: payments-prod-promoters
+  namespace: payments
 - kind: ServiceAccount
   name: payments-release-bot
   namespace: payments

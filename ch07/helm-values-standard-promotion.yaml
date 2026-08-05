@@ -21,7 +21,10 @@ promotion:
     requirePullRequest: true
   prod:
     requirePullRequest: true
-    authorizedPromoters:
+    # Rendered by this chart into a Role granting Kargo's `promote` verb on
+    # the prod Stage via resourceNames, plus a RoleBinding. Not a Kargo API
+    # field: Kargo has no per-Stage list of authorized subjects.
+    promoterClaimSubs:
     - alice
     - carol
 
