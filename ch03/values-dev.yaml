@@ -1,0 +1,10 @@
+# Chapter: 3. Getting started with Kargo
+# Section: Preparing the GitOps repository
+# Kargo version: 1.12.1
+# Status: UNVERIFIED
+
+# tag::content[]
+image:
+  tag: "1.0.0"
+  digest: ""
+# end::content[]
