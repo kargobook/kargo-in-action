@@ -1,0 +1,26 @@
+# Chapter: 5. Promoting safely: automatic, manual, and recoverable
+# Section: 5.8 Automating rollback
+# Kargo version: 1.12.1
+# Status: UNVERIFIED
+# Kargo Enterprise only: the autoRollback field is ignored by Kargo OSS.
+#
+# A Project has exactly ONE ProjectConfig, so this is not a second object to
+# apply alongside the one in stage-dev-auto-promotion.yaml: applying both would
+# overwrite that file's dev auto-promotion policy. Both entries belong in the
+# single promotionPolicies list of the one ProjectConfig named `demo`.
+
+# tag::content[]
+apiVersion: kargo.akuity.io/v1alpha1
+kind: ProjectConfig
+metadata:
+  name: demo
+  namespace: demo
+spec:
+  promotionPolicies:
+  - stageSelector:
+      name: prod
+    autoRollback:          # <1>
+      onVerification:      # <2>
+      - Failed
+      - Error
+# end::content[]

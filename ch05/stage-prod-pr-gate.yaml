@@ -1,8 +1,9 @@
 # Chapter: 5. Promoting safely: automatic, manual, and recoverable
 # Section: 5.3.1 Pull request-based approval gates
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
@@ -15,36 +16,44 @@ spec:
       name: demo-app
     sources:
       stages:
-      - pre-prod
+      - pre-prod                                         # <1>
   promotionTemplate:
     spec:
+      vars:
+        - name: gitRepo
+          value: https://github.com/kargobook/demo-gitops.git
       steps:
       - uses: git-clone
         config:
-          repoURL: https://github.com/kargobook/demo-gitops.git
+          repoURL: ${{ vars.gitRepo }}
           checkout:
           - branch: main
             path: ./repo
-      - uses: kustomize-set-image
+      - uses: yaml-update
         config:
-          path: ./repo/envs/prod
-          images:
-          - image: ghcr.io/kargobook/demo-app
-            tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
+          path: ./repo/envs/prod/values.yaml
+          updates:
+          - key: image.digest
+            value: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
       - uses: git-commit
-        as: commit
         config:
           path: ./repo
           message: 'Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
-      - uses: git-open-pr
-        as: open-pr
+      - uses: git-push
+        as: push
         config:
-          repoURL: https://github.com/kargobook/demo-gitops.git
-          sourceBranch: promote/prod-${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
-          targetBranch: main
+          path: ./repo
+          generateTargetBranch: true                     # <2>
+      - uses: git-open-pr
+        as: open-pr                                      # <3>
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          sourceBranch: ${{ outputs.push.branch }}
+          targetBranch: main                             # <4>
           title: 'Promote ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production'
           description: |
-            Promotes ghcr.io/kargobook/demo-app:${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production.
+            Promotes ghcr.io/kargobook/demo-app to production.
+            Tag: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}
 
             Upstream stage: pre-prod
 
@@ -52,7 +61,16 @@ spec:
       - uses: git-wait-for-pr
         as: wait-pr
         retry:
-          timeout: 24h
+          timeout: 24h                                   # <5>
         config:
-          repoURL: https://github.com/kargobook/demo-gitops.git
-          prNumber: ${{ outputs['open-pr'].pr.id }}
+          repoURL: ${{ vars.gitRepo }}
+          prNumber: ${{ outputs['open-pr'].pr.id }}      # <6>
+      - uses: argocd-update
+        config:
+          apps:
+          - name: demo-prod
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs['wait-pr'].commit }}  # <7>
+              updateTargetRevision: true
+# end::content[]

@@ -1,0 +1,35 @@
+# Chapter: 5. Promoting safely: automatic, manual, and recoverable
+# Section: 5.4.2 Promotion windows
+# Kargo version: 1.12.1
+# Status: UNVERIFIED
+# Kargo Enterprise only (beta): Kargo OSS accepts the promotionWindows field but
+# ignores it; only Kargo Enterprise evaluates and enforces the schedule. Checked
+# against the Promotion Windows guide and the PromotionWindow API type at the
+# v1.12.1 release tag; not yet run against a Kargo Enterprise installation.
+#
+# A Project has exactly ONE ProjectConfig, so this is not a second object to
+# apply alongside the one in stage-dev-auto-promotion.yaml: applying both would
+# overwrite that file's promotionPolicies. promotionWindows belongs beside
+# promotionPolicies in the single ProjectConfig named `demo`.
+
+# tag::content[]
+apiVersion: kargo.akuity.io/v1alpha1
+kind: ProjectConfig
+metadata:
+  name: demo
+  namespace: demo
+spec:
+  promotionWindows:
+  - name: end-of-year-freeze
+    kind: Deny                                          # <1>
+    description: "Company-wide change freeze; see CHG-4821"
+    dtstart: "20261224T000000"                          # <2>
+    dtend: "20261227T000000"
+  - name: prod-business-hours
+    kind: Allow                                         # <3>
+    stageSelector:
+      name: prod                                        # <4>
+    rrule: FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR             # <5>
+    dtstart: "TZID=America/New_York:20260105T090000"    # <6>
+    dtend: "TZID=America/New_York:20260105T170000"
+# end::content[]

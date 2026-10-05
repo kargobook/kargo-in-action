@@ -1,13 +1,16 @@
 # Chapter: 5. Promoting safely: automatic, manual, and recoverable
-# Section: 5.2 Automatic promotion
+# Section: 5.3.2 Native approval gates
 # Kargo version: 1.12.1
 # Status: UNVERIFIED
+# Kargo Enterprise only (beta): the wait-for-approval step is not available in
+# Kargo OSS. Checked against the wait-for-approval step reference at the v1.12.1
+# release tag; not yet run against a Kargo Enterprise installation.
 
 # tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
-  name: dev
+  name: prod
   namespace: demo
 spec:
   requestedFreight:
@@ -15,13 +18,23 @@ spec:
       kind: Warehouse
       name: demo-app
     sources:
-      direct: true                  # <1>
+      stages:
+      - pre-prod
   promotionTemplate:
     spec:
       vars:
         - name: gitRepo
           value: https://github.com/kargobook/demo-gitops.git
       steps:
+      - uses: wait-for-approval         # <1>
+        as: approve
+        config:
+          minApprovals: 2               # <2>
+          approvers:
+          - claim: groups
+            value: platform-leads
+            required: true              # <3>
+          - role: release-manager       # <4>
       - uses: git-clone
         config:
           repoURL: ${{ vars.gitRepo }}
@@ -30,14 +43,14 @@ spec:
             path: ./repo
       - uses: yaml-update
         config:
-          path: ./repo/envs/dev/values.yaml
+          path: ./repo/envs/prod/values.yaml
           updates:
           - key: image.digest
             value: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
       - uses: git-commit
         config:
           path: ./repo
-          message: 'Promote to dev: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
+          message: 'Promote to prod: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
       - uses: git-push
         as: push
         config:
@@ -46,20 +59,9 @@ spec:
       - uses: argocd-update
         config:
           apps:
-          - name: demo-dev
+          - name: demo-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
               desiredRevision: ${{ outputs.push.commit }}
               updateTargetRevision: true
----
-apiVersion: kargo.akuity.io/v1alpha1
-kind: ProjectConfig                 # <2>
-metadata:
-  name: demo
-  namespace: demo
-spec:
-  promotionPolicies:
-  - stageSelector:
-      name: dev                     # <3>
-    autoPromotionEnabled: true      # <4>
 # end::content[]
