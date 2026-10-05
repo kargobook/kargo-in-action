@@ -16,7 +16,7 @@ spec:
       name: demo-app
     sources:
       stages:
-      - pre-prod                                         # <1>
+      - pre-prod                                                                         # <1>
   promotionTemplate:
     spec:
       vars:
@@ -43,13 +43,13 @@ spec:
         as: push
         config:
           path: ./repo
-          generateTargetBranch: true                     # <2>
+          generateTargetBranch: true                                                     # <2>
       - uses: git-open-pr
-        as: open-pr                                      # <3>
+        as: open-pr                                                                      # <3>
         config:
           repoURL: ${{ vars.gitRepo }}
           sourceBranch: ${{ outputs.push.branch }}
-          targetBranch: main                             # <4>
+          targetBranch: main                                                             # <4>
           title: 'Promote ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }} to production'
           description: |
             Promotes ghcr.io/kargobook/demo-app to production.
@@ -60,17 +60,18 @@ spec:
             Review the changes below and merge to approve the promotion.
       - uses: git-wait-for-pr
         as: wait-pr
+        if: ${{ status('open-pr') != 'Skipped' }}                                        # <5>
         retry:
-          timeout: 24h                                   # <5>
+          timeout: 24h                                                                   # <6>
         config:
           repoURL: ${{ vars.gitRepo }}
-          prNumber: ${{ outputs['open-pr'].pr.id }}      # <6>
+          prNumber: ${{ outputs['open-pr'].pr.id }}                                      # <7>
       - uses: argocd-update
         config:
           apps:
           - name: demo-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
-              desiredRevision: ${{ outputs['wait-pr'].commit }}  # <7>
+              desiredRevision: ${{ outputs['wait-pr']?.commit ?? outputs.push.commit }}  # <8>
               updateTargetRevision: true
 # end::content[]

@@ -38,6 +38,7 @@ steps:
     title: "Promote ${{ imageFrom(vars.imageRepo).Tag }} to production"
 - uses: git-wait-for-pr
   as: wait-pr
+  if: ${{ status('pr') != 'Skipped' }}
   retry:
     timeout: 4h
   config:
@@ -49,7 +50,7 @@ steps:
     - name: my-app-production
       sources:
       - repoURL: https://github.com/kargobook/demo-gitops.git
-        desiredRevision: ${{ outputs['wait-pr'].commit }}
+        desiredRevision: ${{ outputs['wait-pr']?.commit ?? outputs.push.commit }}
         updateTargetRevision: true
 
 # end::content[]
