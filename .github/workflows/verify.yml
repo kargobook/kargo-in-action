@@ -68,8 +68,9 @@ jobs:
         # Argo Rollouts CRDs and controller must exist *before* Kargo starts.
         # Kargo's controller checks for the AnalysisTemplate/AnalysisRun CRDs
         # once, at its own startup, and disables Rollouts integration for the
-        # life of that process if they're missing at that moment. Verified
-        # locally against a real Kargo 1.11.0 + Argo Rollouts 1.9.1 install:
+        # life of that process if they're missing at that moment. First
+        # observed on a Kargo 1.11.0 + Argo Rollouts 1.9.1 install, before this
+        # job moved to Kargo 1.12.1 (the version CI now targets):
         # installing the CRDs alone left an AnalysisRun stuck with no phase
         # forever (nothing reconciles it); only after the Argo Rollouts
         # controller was also running did the Job run and the AnalysisRun
@@ -78,6 +79,7 @@ jobs:
         kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/download/v1.9.1/install.yaml
         kubectl wait --for=condition=Available deployment/argo-rollouts -n argo-rollouts --timeout=120s
         helm install kargo oci://ghcr.io/akuity/kargo-charts/kargo \
+          --version 1.12.1 \
           --namespace kargo --create-namespace \
           --set api.adminAccount.passwordHash='$2a$10$placeholderplaceholderplaceholderplaceholderplaceholder' \
           --set api.adminAccount.tokenSigningKey=ci-signing-key \
@@ -89,9 +91,10 @@ jobs:
         # A bare `kubectl create namespace` is not enough: Kargo's admission
         # webhook rejects Stages/Warehouses in a namespace unless it was
         # provisioned by a real (non-dry-run) Project apply, which is what
-        # labels the namespace `kargo.akuity.io/project: "true"`. Verified
-        # locally against a real Kargo 1.11.0 install: dry-running a Stage
-        # against a `kubectl create namespace`-only namespace fails with
+        # labels the namespace `kargo.akuity.io/project: "true"`. First
+        # observed on Kargo 1.11.0; CI now targets 1.12.1, and this job fails
+        # loudly if the behavior changes: dry-running a Stage against a
+        # `kubectl create namespace`-only namespace fails with
         # `namespace "demo" is not a project`.
         kubectl apply -f ch03/project-demo.yaml
         # No book example defines a Project named kargobook-demo (only
@@ -122,6 +125,10 @@ jobs:
         #   sets, so installing Argo Rollouts below does not supply
         #   `applications.argoproj.io`. This job installs no Argo CD, so that
         #   CRD does not exist here.
+        # ch03/values-dev.yaml
+        #   A Helm values file for the demo-app chart, not a Kubernetes
+        #   object: no apiVersion/kind, so there is nothing for the API
+        #   server to validate. Argo CD renders it with the chart.
         # ch03/stage-dev-verification.yaml
         #   A `spec:`-only fragment showing where the `verification` block
         #   sits; no apiVersion/kind, so there is nothing for the API server
@@ -156,6 +163,7 @@ jobs:
         SKIP_FILES=(
           "ch03/git-credentials-secret.yaml"
           "ch03/argocd-apps.yaml"
+          "ch03/values-dev.yaml"
           "ch03/stage-dev-verification.yaml"
           "ch03/freight-example.yaml"
           "ch03/promotion-example.yaml"
