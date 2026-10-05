@@ -1,13 +1,20 @@
 # Chapter: Appendix B. Built-In Promotion Step Reference
 # Section: argocd-update
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
+- uses: git-push
+  as: push
+  config:
+    path: ./repo
 - uses: argocd-update
   config:
     apps:
     - name: payments-production
       sources:
       - repoURL: https://github.com/kargobook/demo-gitops.git
-        desiredRevision: ${{ outputs['commit'].commit }}
+        desiredRevision: ${{ outputs.push.commit }}
+        updateTargetRevision: true
 
+# end::content[]

@@ -1,6 +1,6 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.3 From pipelines to Stage graphs
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 #
 # Exercised by hand on 2026-08-04 against a kind cluster running Kargo 1.11.0
@@ -14,7 +14,7 @@
 #
 # The template the smoke Stage in ch04/stage-smoke.yaml names. Same shape as
 # ch03/analysistemplate-dev-health.yaml, pointed at demo-smoke, the namespace
-# the smoke overlay deploys into. Chapter 3 never creates that namespace, which
+# the smoke environment deploys into. Chapter 3 never creates that namespace, which
 # is why the two chapters carry separate templates.
 #
 # Uses the `job` provider for the same reason chapter 3's template does: the

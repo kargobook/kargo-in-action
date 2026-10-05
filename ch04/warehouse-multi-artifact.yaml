@@ -1,8 +1,9 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.2.2 Multi-artifact Freight
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Warehouse
 metadata:
@@ -16,3 +17,4 @@ spec:
   - chart:                                           # <2>
       repoURL: oci://ghcr.io/kargobook/charts/demo-app
       semverConstraint: ^1.0.0
+# end::content[]

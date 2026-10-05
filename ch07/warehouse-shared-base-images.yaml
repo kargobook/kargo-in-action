@@ -1,8 +1,9 @@
 # Chapter: 7. Multi-Service and Multi-Team Patterns
 # Section: Shared Warehouses
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 # Managed by the platform team in the kargo namespace
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Warehouse
@@ -18,3 +19,4 @@ spec:
       repoURL: ghcr.io/example/sidecar-proxy
       constraint: ">=1.5.0 <2.0.0"
 
+# end::content[]

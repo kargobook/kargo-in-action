@@ -1,8 +1,9 @@
 # Chapter: Appendix B. Built-In Promotion Step Reference
 # Section: GitOps Update with PR Gate
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 vars:
 - name: imageRepo
   value: registry.example.com/my-app
@@ -13,18 +14,16 @@ steps:
     checkout:
     - branch: main
       path: ./repo
-- uses: kustomize-set-image
-  as: update-image
+- uses: yaml-update
   config:
-    path: ./repo/envs/prod
-    images:
-    - image: ${{ vars.imageRepo }}
-      tag: ${{ imageFrom(vars.imageRepo).Tag }}
+    path: ./repo/envs/prod/values.yaml
+    updates:
+    - key: image.digest
+      value: ${{ imageFrom(vars.imageRepo).Digest }}
 - uses: git-commit
-  as: commit
   config:
     path: ./repo
-    message: ${{ outputs['update-image'].commitMessage }}
+    message: 'Promote ${{ imageFrom(vars.imageRepo).Tag }} to production'
 - uses: git-push
   as: push
   config:
@@ -38,9 +37,19 @@ steps:
     targetBranch: main
     title: "Promote ${{ imageFrom(vars.imageRepo).Tag }} to production"
 - uses: git-wait-for-pr
+  as: wait-pr
   retry:
     timeout: 4h
   config:
     repoURL: https://github.com/kargobook/demo-gitops.git
     prNumber: ${{ outputs['pr'].pr.id }}
+- uses: argocd-update
+  config:
+    apps:
+    - name: my-app-production
+      sources:
+      - repoURL: https://github.com/kargobook/demo-gitops.git
+        desiredRevision: ${{ outputs['wait-pr'].commit }}
+        updateTargetRevision: true
 
+# end::content[]

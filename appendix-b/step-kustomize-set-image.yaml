@@ -1,8 +1,9 @@
 # Chapter: Appendix B. Built-In Promotion Step Reference
 # Section: kustomize-set-image
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 - uses: kustomize-set-image
   config:
     path: ./repo/envs/production
@@ -10,3 +11,4 @@
     - image: registry.example.com/payments-api
       tag: ${{ imageFrom("registry.example.com/payments-api").Tag }}
 
+# end::content[]

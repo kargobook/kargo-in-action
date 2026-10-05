@@ -22,7 +22,7 @@ go test -v ./...
 
 ```bash
 curl -fsSL -o /tmp/kargo-go.mod \
-  https://raw.githubusercontent.com/akuity/kargo/v1.11.0/go.mod
+  https://raw.githubusercontent.com/akuity/kargo/v1.12.1/go.mod
 KARGO_GO_MOD=/tmp/kargo-go.mod go test -count=1 -v ./...
 ```
 

@@ -15,8 +15,8 @@ fullnameOverride: ""
 service:
   type: ClusterIP
   port: 80
-  # Port the demo-app container listens on.
-  targetPort: 8080
+  # Port the demo-app container (nginx) listens on.
+  targetPort: 80
 
 resources: {}
 

@@ -1,10 +1,12 @@
 # Chapter: 3. Getting started with Kargo
 # Section: The core resource model / Creating the Kargo Project
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 # Source: https://github.com/kargobook/demo-gitops/blob/main/setup/01-project.yaml
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Project
 metadata:
   name: demo
+# end::content[]

@@ -1,8 +1,9 @@
 # Chapter: 7. Multi-Service and Multi-Team Patterns
 # Section: Cross-Team Promotion Dependencies
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
@@ -22,17 +23,28 @@ spec:
           checkout:
           - branch: main
             path: ./repo
-      - uses: kustomize-set-image
+      - uses: yaml-update
         config:
-          path: ./repo/apps/payments/envs/pre-prod
-          images:
-          - image: ghcr.io/kargobook/payments-api
+          path: ./repo/apps/payments/envs/pre-prod/values.yaml
+          updates:
+          - key: image.digest
+            value: ${{ imageFrom("ghcr.io/kargobook/payments-api").Digest }}
       - uses: git-commit
         config:
           path: ./repo
           message: "Promote payments to pre-prod: ${{ freight.images[0].tag }}"
       - uses: git-push
+        as: push
         config:
           path: ./repo
           targetBranch: main
+      - uses: argocd-update
+        config:
+          apps:
+          - name: payments-pre-prod
+            sources:
+            - repoURL: https://github.com/kargobook/demo-gitops.git
+              desiredRevision: ${{ outputs.push.commit }}
+              updateTargetRevision: true
 
+# end::content[]

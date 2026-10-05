@@ -1,8 +1,9 @@
 # Chapter: 7. Multi-Service and Multi-Team Patterns
 # Section: Defining Independent Dev Stages
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
@@ -25,19 +26,29 @@ spec:
           checkout:
           - branch: main
             path: ./repo
-      - uses: kustomize-set-image
+      - uses: yaml-update
         config:
-          path: ./repo/apps/api/envs/dev
-          images:
-          - image: ghcr.io/example/api-service
+          path: ./repo/apps/api/envs/dev/values.yaml
+          updates:
+          - key: image.digest
+            value: ${{ imageFrom("ghcr.io/example/api-service").Digest }}
       - uses: git-commit
         config:
           path: ./repo
           message: "Promote api to dev: ${{ freight.image.tag }}"
       - uses: git-push
+        as: push
         config:
           path: ./repo
           targetBranch: main
+      - uses: argocd-update
+        config:
+          apps:
+          - name: api-dev
+            sources:
+            - repoURL: https://github.com/kargobook/demo-gitops.git
+              desiredRevision: ${{ outputs.push.commit }}
+              updateTargetRevision: true
 ---
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
@@ -61,17 +72,28 @@ spec:
           checkout:
           - branch: main
             path: ./repo
-      - uses: kustomize-set-image
+      - uses: yaml-update
         config:
-          path: ./repo/apps/frontend/envs/dev
-          images:
-          - image: ghcr.io/example/frontend-service
+          path: ./repo/apps/frontend/envs/dev/values.yaml
+          updates:
+          - key: image.digest
+            value: ${{ imageFrom("ghcr.io/example/frontend-service").Digest }}
       - uses: git-commit
         config:
           path: ./repo
           message: "Promote frontend to dev: ${{ freight.image.tag }}"
       - uses: git-push
+        as: push
         config:
           path: ./repo
           targetBranch: main
+      - uses: argocd-update
+        config:
+          apps:
+          - name: frontend-dev
+            sources:
+            - repoURL: https://github.com/kargobook/demo-gitops.git
+              desiredRevision: ${{ outputs.push.commit }}
+              updateTargetRevision: true
 
+# end::content[]

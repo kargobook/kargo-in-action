@@ -1,8 +1,9 @@
 # Chapter: Appendix B. Built-In Promotion Step Reference
 # Section: Custom Validation with http Polling
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 steps:
 - uses: git-clone
   # ... standard git update steps ...
@@ -12,6 +13,7 @@ steps:
     path: ./out
     message: "chore: promote to pre-prod"
 - uses: git-push
+  as: push
   config:
     path: ./out
 - uses: argocd-update
@@ -20,7 +22,8 @@ steps:
     - name: my-app-pre-prod
       sources:
       - repoURL: https://github.com/kargobook/demo-gitops.git
-        desiredRevision: ${{ outputs['commit'].commit }}
+        desiredRevision: ${{ outputs.push.commit }}
+        updateTargetRevision: true
 - uses: http
   retry:
     timeout: 15m
@@ -29,3 +32,4 @@ steps:
     successExpression: response.status == 200
     failureExpression: response.status == 500
 
+# end::content[]

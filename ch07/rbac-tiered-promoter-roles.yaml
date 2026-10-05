@@ -1,8 +1,9 @@
 # Chapter: 7. Multi-Service and Multi-Team Patterns
 # Section: Isolating teams with per-Project namespaces and RBAC
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 # The release bot's own identity. It authenticates with this
 # ServiceAccount's token, so it needs no claim annotation.
 apiVersion: v1
@@ -127,3 +128,5 @@ roleRef:
   kind: Role
   name: promoter-prod
   apiGroup: rbac.authorization.k8s.io
+
+# end::content[]

@@ -1,8 +1,9 @@
 # Chapter: 3. Getting started with Kargo
 # Section: Defining the Warehouse
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Warehouse
 metadata:
@@ -14,3 +15,4 @@ spec:
       repoURL: ghcr.io/kargobook/demo-app
       constraint: ">=1.0.0 <2.0.0"
 
+# end::content[]

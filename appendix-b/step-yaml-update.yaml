@@ -1,12 +1,14 @@
 # Chapter: Appendix B. Built-In Promotion Step Reference
 # Section: yaml-update
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 - uses: yaml-update
   config:
-    path: ./repo/values-pre-prod.yaml
+    path: ./repo/envs/pre-prod/values.yaml
     updates:
-    - key: image.tag
-      value: ${{ imageFrom("registry.example.com/payments-api").Tag }}
+    - key: image.digest
+      value: ${{ imageFrom("registry.example.com/payments-api").Digest }}
 
+# end::content[]

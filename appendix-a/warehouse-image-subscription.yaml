@@ -1,8 +1,9 @@
 # Chapter: Appendix A. Kargo Resource Reference
 # Section: Subscription Fields
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 subscriptions:
 - image:
     repoURL: registry.example.com/my-app       # Required: OCI registry URL
@@ -16,3 +17,4 @@ subscriptions:
     platform: linux/amd64                      # Optional: constrain to platform
     discoveryLimit: 20                         # Max Freight to retain
 
+# end::content[]

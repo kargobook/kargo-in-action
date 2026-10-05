@@ -1,8 +1,9 @@
 # Chapter: Appendix A. Kargo Resource Reference
 # Section: requestedFreight Fields
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 requestedFreight:
 - origin:
     kind: Warehouse                      # Warehouse | Stage
@@ -13,3 +14,4 @@ requestedFreight:
     - payments-dev
     - payments-pre-prod
 
+# end::content[]

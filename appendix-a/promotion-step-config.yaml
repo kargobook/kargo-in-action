@@ -1,8 +1,9 @@
 # Chapter: Appendix A. Kargo Resource Reference
 # Section: PromotionStepConfig (Enterprise)
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: PromotionStepConfig
 metadata:
@@ -32,3 +33,4 @@ spec:
       memory: "256Mi"
       cpu: "500m"
 
+# end::content[]

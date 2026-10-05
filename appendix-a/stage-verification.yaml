@@ -1,8 +1,9 @@
 # Chapter: Appendix A. Kargo Resource Reference
 # Section: verification Fields
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 verification:
   analysisTemplates:
   - name: success-rate-check             # AnalysisTemplate resource name
@@ -15,3 +16,4 @@ verification:
     - name: service-url
       value: https://pre-prod.payments.example.com
 
+# end::content[]

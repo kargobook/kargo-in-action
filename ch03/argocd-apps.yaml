@@ -1,8 +1,9 @@
 # Chapter: 3. Getting started with Kargo
 # Section: Creating the Argo CD Applications
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -15,9 +16,13 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<your-github-username>/demo-gitops.git
+    repoURL: https://github.com/kargobook/demo-gitops.git
     targetRevision: main
-    path: envs/dev
+    path: charts/demo-app
+    helm:
+      releaseName: demo-app
+      valueFiles:
+      - ../../envs/dev/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: demo-dev
@@ -40,9 +45,13 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<your-github-username>/demo-gitops.git
+    repoURL: https://github.com/kargobook/demo-gitops.git
     targetRevision: main
-    path: envs/pre-prod
+    path: charts/demo-app
+    helm:
+      releaseName: demo-app
+      valueFiles:
+      - ../../envs/pre-prod/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: demo-pre-prod
@@ -65,9 +74,13 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<your-github-username>/demo-gitops.git
+    repoURL: https://github.com/kargobook/demo-gitops.git
     targetRevision: main
-    path: envs/prod
+    path: charts/demo-app
+    helm:
+      releaseName: demo-app
+      valueFiles:
+      - ../../envs/prod/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: demo-prod
@@ -78,3 +91,4 @@ spec:
     syncOptions:
     - CreateNamespace=true
 
+# end::content[]

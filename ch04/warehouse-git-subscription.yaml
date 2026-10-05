@@ -1,8 +1,9 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.1.1 Subscription types
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 spec:
   subscriptions:
   - git:
@@ -13,3 +14,4 @@ spec:
       excludePaths:
       - "infra/database/docs/**"
       since: "2026-01-01T00:00:00Z"                             # <4>
+# end::content[]

@@ -1,8 +1,9 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.4.4 Multi-service Stage graphs
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 apiVersion: kargo.akuity.io/v1alpha1
 kind: Stage
 metadata:
@@ -34,24 +35,24 @@ spec:
           checkout:
           - branch: main
             path: ./repo
-      - uses: kustomize-set-image
+      - uses: yaml-update
         config:
-          path: ./repo/apps/payments/envs/pre-prod
-          images:
-          - image: ghcr.io/kargobook/payments-api
-            digest: ${{ imageFrom("ghcr.io/kargobook/payments-api").Digest }}
-      - uses: kustomize-set-image
+          path: ./repo/apps/payments/envs/pre-prod/values.yaml
+          updates:
+          - key: image.digest
+            value: ${{ imageFrom("ghcr.io/kargobook/payments-api").Digest }}
+      - uses: yaml-update
         config:
-          path: ./repo/apps/auth/envs/pre-prod
-          images:
-          - image: ghcr.io/kargobook/auth-service
-            digest: ${{ imageFrom("ghcr.io/kargobook/auth-service").Digest }}
+          path: ./repo/apps/auth/envs/pre-prod/values.yaml
+          updates:
+          - key: image.digest
+            value: ${{ imageFrom("ghcr.io/kargobook/auth-service").Digest }}
       - uses: git-commit                             # <3>
-        as: commit
         config:
           path: ./repo
           message: 'Promote payments-api and auth-service to pre-prod'
       - uses: git-push
+        as: push
         config:
           path: ./repo
           targetBranch: main
@@ -61,8 +62,11 @@ spec:
           - name: payments-pre-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
-              desiredRevision: ${{ outputs['commit'].commit }}
+              desiredRevision: ${{ outputs.push.commit }}
+              updateTargetRevision: true
           - name: auth-pre-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
-              desiredRevision: ${{ outputs['commit'].commit }}
+              desiredRevision: ${{ outputs.push.commit }}
+              updateTargetRevision: true
+# end::content[]

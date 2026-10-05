@@ -17,9 +17,7 @@ jobs:
         # plain yaml.safe_load_all() will always fail on them regardless of
         # whether the chart itself is correct. They render to YAML only after
         # `helm template` substitutes their values, which this generic parse
-        # check doesn't do. Excluded for that structural reason, the same way
-        # ch03/kustomization-dev.yaml is excluded from the apply job's
-        # dry-run loop below for being a non-Kubernetes build file.
+        # check doesn't do. Excluded for that structural reason.
         EXCLUDE_GLOBS = ["charts/*/templates/*.yaml"]
         files = sorted(glob.glob("**/*.yaml", recursive=True))
         files = [
@@ -51,7 +49,7 @@ jobs:
         # The Kargo release the book is written against. TestSemverVersionMatchesKargo
         # compares this module's Masterminds/semver pin against Kargo's own, so the
         # test keeps describing Kargo's behavior and not just a local pin.
-        KARGO_VERSION: v1.11.0
+        KARGO_VERSION: v1.12.1
       run: |
         curl -fsSL -o /tmp/kargo-go.mod \
           "https://raw.githubusercontent.com/akuity/kargo/${KARGO_VERSION}/go.mod"
@@ -118,11 +116,6 @@ jobs:
         #   Contains credential-shaped placeholder material. Excluded from
         #   automated apply entirely; handled separately, out of scope for
         #   this CI check.
-        # ch03/kustomization-dev.yaml
-        #   `kind: Kustomization` is a Kustomize build file, not a
-        #   Kubernetes API resource. There is no CRD for it; the API server
-        #   would reject it with "no matches for kind". Build it with
-        #   `kubectl kustomize` / `kustomize build`, not `kubectl apply`.
         # ch03/argocd-apps.yaml
         #   Requires Argo CD's `Application` CRD. Note that Argo CD and Argo
         #   Rollouts share the `argoproj.io` API group but ship disjoint CRD
@@ -162,7 +155,6 @@ jobs:
         #   Stage manifest" in the file's own header comment.
         SKIP_FILES=(
           "ch03/git-credentials-secret.yaml"
-          "ch03/kustomization-dev.yaml"
           "ch03/argocd-apps.yaml"
           "ch03/stage-dev-verification.yaml"
           "ch03/freight-example.yaml"

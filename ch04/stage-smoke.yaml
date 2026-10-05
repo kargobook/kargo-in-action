@@ -1,6 +1,6 @@
 # Chapter: 4. Modeling your delivery: Warehouses, Freight, and Stage graphs
 # Section: 4.3 Designing Stage graphs
-# Kargo version: 1.11.0
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
 # tag::content[]
@@ -16,10 +16,10 @@ spec:
       name: demo-app
     sources:
       stages:
-      - dev                                   # <1>
+      - dev                                    # <1>
   verification:
     analysisTemplates:
-    - name: smoke-health                      # <2>
+    - name: smoke-health                       # <2>
   promotionTemplate:
     spec:
       vars:
@@ -32,18 +32,18 @@ spec:
           checkout:
           - branch: main
             path: ./repo
-      - uses: kustomize-set-image
+      - uses: yaml-update
         config:
-          path: ./repo/envs/smoke             # <3>
-          images:
-          - image: ghcr.io/kargobook/demo-app
-            digest: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
+          path: ./repo/envs/smoke/values.yaml  # <3>
+          updates:
+          - key: image.digest
+            value: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
       - uses: git-commit
-        as: commit
         config:
           path: ./repo
           message: 'Promote to smoke: ${{ imageFrom("ghcr.io/kargobook/demo-app").Tag }}'
       - uses: git-push
+        as: push
         config:
           path: ./repo
           targetBranch: main
@@ -53,5 +53,6 @@ spec:
           - name: demo-smoke
             sources:
             - repoURL: ${{ vars.gitRepo }}
-              desiredRevision: ${{ outputs['commit'].commit }}
+              desiredRevision: ${{ outputs.push.commit }}
+              updateTargetRevision: true
 # end::content[]

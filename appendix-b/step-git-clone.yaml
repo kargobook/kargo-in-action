@@ -1,8 +1,9 @@
 # Chapter: Appendix B. Built-In Promotion Step Reference
 # Section: git-clone
-# Kargo version: 1.x
+# Kargo version: 1.12.1
 # Status: UNVERIFIED
 
+# tag::content[]
 - uses: git-clone
   as: clone
   config:
@@ -11,3 +12,4 @@
     - branch: main
       path: ./repo
 
+# end::content[]
