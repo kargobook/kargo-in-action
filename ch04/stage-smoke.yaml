@@ -17,9 +17,6 @@ spec:
     sources:
       stages:
       - dev                                    # <1>
-  verification:
-    analysisTemplates:
-    - name: smoke-health                       # <2>
   promotionTemplate:
     spec:
       vars:
@@ -34,7 +31,7 @@ spec:
             path: ./repo
       - uses: yaml-update
         config:
-          path: ./repo/envs/smoke/values.yaml  # <3>
+          path: ./repo/envs/smoke/values.yaml  # <2>
           updates:
           - key: image.digest
             value: ${{ imageFrom("ghcr.io/kargobook/demo-app").Digest }}
